@@ -1,11 +1,12 @@
 package org.usfirst.frc.team662.robot;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This is a demo program showing the use of the RobotDrive class. The
@@ -25,23 +26,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * instead if you're new.
  */
 public class Robot extends SampleRobot {
-	RobotDrive myRobot;
 	Joystick stick;
-	final String defaultAuto = "Default";
-	final String customAuto = "My Auto";
-	SendableChooser chooser;
+	ArrayList<Component> components;
 
 	public Robot() {
-		myRobot = new RobotDrive(0, 1);
-		myRobot.setExpiration(0.1);
+		components = new ArrayList<Component>();
+		components.add();
+
 		stick = new Joystick(0);
 	}
 
 	public void robotInit() {
-		chooser = new SendableChooser();
-		chooser.addDefault("Default Auto", defaultAuto);
-		chooser.addObject("My Auto", customAuto);
-		SmartDashboard.putData("Auto modes", chooser);
+
 	}
 
 	/**
@@ -56,25 +52,10 @@ public class Robot extends SampleRobot {
 	 * SendableChooser make sure to add them to the chooser code above as well.
 	 */
 	public void autonomous() {
-
-		String autoSelected = (String) chooser.getSelected();
-		//		String autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
-		System.out.println("Auto selected: " + autoSelected);
-
-		switch (autoSelected) {
-		case customAuto:
-			myRobot.setSafetyEnabled(false);
-			myRobot.drive(-0.5, 1.0); // spin at half speed
-			Timer.delay(2.0); //    for 2 seconds
-			myRobot.drive(0.0, 0.0); // stop robot
-			break;
-		case defaultAuto:
-		default:
-			myRobot.setSafetyEnabled(false);
-			myRobot.drive(-0.5, 0.0); // drive forwards half speed
-			Timer.delay(2.0); //    for 2 seconds
-			myRobot.drive(0.0, 0.0); // stop robot
-			break;
+		while (isEnabled() && isAutonomous()) {
+			for (int i = components.size(); i >= 0; i--) {
+				components.get(i).autoUpdate();
+			}
 		}
 	}
 
@@ -82,10 +63,10 @@ public class Robot extends SampleRobot {
 	 * Runs the motors with arcade steering.
 	 */
 	public void operatorControl() {
-		myRobot.setSafetyEnabled(true);
 		while (isOperatorControl() && isEnabled()) {
-			myRobot.arcadeDrive(stick); // drive with arcade style (use right stick)
-			Timer.delay(0.005); // wait for a motor update time
+			for (int i = components.size(); i >= 0; i--) {
+				components.get(i).update();
+			}
 		}
 	}
 

@@ -7,13 +7,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class Gyroscope implements Component {
 
 	
-	AnalogGyro gyro1 = new AnalogGyro(1);
+	AnalogGyro gyro1 = new AnalogGyro(0);
 	
 	
 	public Gyroscope(){
 		
-		gyro1.initGyro();
-		gyro1.calibrate();
+		//gyro1.initGyro();
+		//gyro1.calibrate();
+		//gyro1.setSensitivity(1);
+		//gyro1.reset();
 		
 	}
 	

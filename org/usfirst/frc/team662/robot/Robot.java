@@ -55,7 +55,12 @@ public class Robot extends SampleRobot {
 	}
 
 	public void robotInit() {
-
+		components = new ArrayList<Component>();
+		components.add(new Gyroscope());
+		components.add(new motor());
+		//components.add(new Solanoid());
+		stick = new Joystick(0);
+		stick.getRawAxis(0);
 	}
 
 	/**
@@ -71,7 +76,7 @@ public class Robot extends SampleRobot {
 	 */
 	public void autonomous() {
 		while (isEnabled() && isAutonomous()) {
-			for (int i = components.size(); i >= 0; i--) {
+			for (int i = components.size() - 1; i >= 0; i--) {
 				components.get(i).autoUpdate();
 				if(!SmartDashboard.getBoolean(components.get(i).getClass().getName(), true)){
 					disabled.add(components.get(i));
@@ -92,7 +97,7 @@ public class Robot extends SampleRobot {
 	 */
 	public void operatorControl() {
 		while (isOperatorControl() && isEnabled()) {
-			for (int i = components.size(); i >= 0; i--) {
+			for (int i = components.size() - 1; i >= 0; i--) {
 				components.get(i).update();
 				if(!SmartDashboard.getBoolean(components.get(i).getClass().getName(), true)){
 					disabled.add(components.get(i));

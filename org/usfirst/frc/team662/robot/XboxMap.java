@@ -13,6 +13,7 @@ public class XboxMap {
 	public static final int RIGHT_TRIGGER = 3;
 	public static final int LEFT_TRIGGER = 2;
 	public static final int D_PAD_HORIZ = 6;
+	public static final int D_PAD_VERT = 7;
 
 	// button constants
 	public static final int A = 1;

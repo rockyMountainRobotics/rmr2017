@@ -15,7 +15,7 @@ public class Gyroscope implements Component {
 		//gyro1.initGyro();
 		//gyro1.calibrate();
 		//gyro1.setSensitivity(1);
-		//gyro1.reset();
+		gyro1.reset();
 		
 	}
 	

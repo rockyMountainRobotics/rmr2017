@@ -26,13 +26,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
  * instead if you're new.
  */
 public class Robot extends SampleRobot {
-	Joystick stick;
+	public static Joystick stick;
 	ArrayList<Component> components;
 
 	public Robot() {
 		components = new ArrayList<Component>();
-		components.add();
-
+		components.add(new GearHolder());
+		components.add(new Drive());
 		stick = new Joystick(0);
 	}
 

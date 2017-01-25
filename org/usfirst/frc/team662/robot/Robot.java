@@ -26,12 +26,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
  * instead if you're new.
  */
 public class Robot extends SampleRobot {
-	Joystick stick;
+	public static Joystick stick;
 	ArrayList<Component> components;
 
 	public Robot() {
 		components = new ArrayList<Component>();
-		components.add();
+		components.add(new motor());
+		components.add(new Recorder());
 
 		stick = new Joystick(0);
 	}
@@ -53,7 +54,7 @@ public class Robot extends SampleRobot {
 	 */
 	public void autonomous() {
 		while (isEnabled() && isAutonomous()) {
-			for (int i = components.size(); i >= 0; i--) {
+			for (int i = components.size() - 1; i >= 0; i--) {
 				components.get(i).autoUpdate();
 			}
 		}
@@ -64,7 +65,7 @@ public class Robot extends SampleRobot {
 	 */
 	public void operatorControl() {
 		while (isOperatorControl() && isEnabled()) {
-			for (int i = components.size(); i >= 0; i--) {
+			for (int i = components.size() - 1; i >= 0; i--) {
 				components.get(i).update();
 			}
 		}

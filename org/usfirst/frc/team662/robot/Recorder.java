@@ -93,7 +93,7 @@ public class Recorder implements Component{
 			//Add them as options if we did!
 			for (int i = 0; i < foundRecords.length; i++) {
 				if(i == 0){
-					autoChooser.addDefault(DIRECTORY + foundRecords[i].getName(), foundRecords[i]);
+					autoChooser.addDefault(foundRecords[i].getName(), foundRecords[i]);
 				}
 				else{
 					autoChooser.addObject(foundRecords[i].getName(), foundRecords[i]);

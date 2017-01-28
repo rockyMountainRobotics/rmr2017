@@ -22,7 +22,14 @@ public class Vision implements Component{
     final static int DRIVE_STATE = 0;
     final static int TURN_STATE = 1;
     int state = 0;
-
+    
+    final static double driveMore = 0.25;
+    final static double driveLess = -0.25;
+    final static int CENTER_THRESHOLD = 160;
+    final static int LEFT_THRESHOLD = 80;
+    final static int RIGHT_THRESHOLD = 240;
+    final static int FINAL_HEIGHT = 20000000;
+    int leftHeight;
 
 	public Vision() {
 	    camera = CameraServer.getInstance().startAutomaticCapture();
@@ -31,105 +38,85 @@ public class Vision implements Component{
 	    camera.setResolution(320,240);
 	    cameraServer.addCamera(camera);
 	    vthread = new VisionThread(camera, new GripPipeline(), pipeline -> {
-	            SmartDashboard.putNumber("dankmemes",pipeline.filterContoursOutput().size());        
+	            SmartDashboard.putNumber("rectangles",pipeline.filterContoursOutput().size());        
 	    });
 	    vthread.start();
 	    
 	    
 	    
 	}
-	public void update(){/*
+	public void update(){
 		camera.setWhiteBalanceManual(0);
-
+		
+		int centerLeft;
+		int centerRight;
+		
+		//VisionThread visthred = new VisionThread(camera, new GripPipeline(), pipeline -> {});
+		
 		 VisionThread visionThread = new VisionThread(camera, new GripPipeline(), pipeline -> {
-		        if (!pipeline.filterContoursOutput().isEmpty()) {
-		            Rect left = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
-		            Rect right = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));		            
-		     
-		            int centerLeft = left.x + (left.width / 2);
-		            int centerRight = right.x + (right.width / 2);
-        
-		            
-
-		          /*if(centerLeft < 160 && centerRight < 160)
-		          {
-		       		DriveMotor1.set(driveLess);
-		       		DriveMotor2.set(driveMore);
-		           }
-		     
-		          if(centerLeft > 160 && centerRight > 160)
-		          {
-		        	DriveMotor1.set(driveMore);
-		        	DriveMotor2.set(driveLess);
-		          }
+			 if (pipeline.filterContoursOutput().size() >= 2) {
+				 Rect left = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
+				 Rect right = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));		            
+				 SmartDashboard.putNumber("rectangles",pipeline.filterContoursOutput().size());
+				 
+				 centerLeft = left.x + (left.width / 2);
+				 centerRight = right.x + (right.width / 2);
+				 leftHeight = right.y;}
+			
+			
+			//Drive motor1 is left, two is right
+				 
+				
+				
+				
+				else if(centerLeft > LEFT_THRESHOLD && centerLeft < CENTER_THRESHOLD)
+				{
+				 
+				 DriveMotor1.set(driveLess);
+				 DriveMotor2.set(driveMore);
+				 
+				}
+				else if(centerLeft < LEFT_THRESHOLD)
+				{
+				 DriveMotor1.set(driveMore);
+				 DriveMotor2.set(driveLess);
+				}
+				else if(centerRight > RIGHT_THRESHOLD)
+				{
+				 DriveMotor1.set(driveLess);
+				 DriveMotor2.set(driveMore);
+				}
+				else if(centerRight < RIGHT_THRESHOLD && centerRight > CENTER_THRESHOLD)
+				{
+				 DriveMotor1.set(driveMore);
+				 DriveMotor2.set(driveLess);
+				}
+				 
+				
+				 //Stops the robot if it gets too close to the peg (peg pokes out 1 foot, maybe stop at 18 inches?)
+				else if(leftHeight >= FINAL_HEIGHT)
+				{
+			   	//Go forward
+					DriveMotor1.set(0);
+					DriveMotor2.set(0);
+				}
+			 
+			 else
+			{
+				
+				DriveMotor1.set(driveLess);
+				DriveMotor2.set(driveMore);
+				
+			}
+				
+			
 		        
-		          //
-		          if(centerLeft ==  80 && centerRight == 240)
-		          {
-		        	  
-		        	  
-		        	  
-		        	  
-		          }
-		        }
-		        *//*
-		            
-		            //Using the left rectangle as the reference point
-		            if(state == DRIVE_STATE) 
-		            {
-		            	if (centerLeft > 80 || centerLeft < 240) {
-		            		DriveMotor1.set(drive);
-			            	DriveMotor2.set(drive);
-		            	}
-		            	
-		            	else 
-		            	{
-		            		state = TURN_STATE;
-		            	}
-		            	
-		            } else if (state == TURN_STATE)
-		            {		
-		            	if(centerLeft  ){
-		            		
-		            		
-		            	}
-		            }
-		            	
-		            	DriveMotor1.set(-0.25);
-		            	DriveMotor2.set(0.25);
-		            } else
-		            {
-		            	state = DRVE_STATE;
-
-		            }
-		           
-		            
-		            
-		          
-		            	
-		            	/*if(centerLeft < 80 || centerLeft > 240)
-		            	{
-		            		DriveMotor1.set(drive);
-		            		DriveMotor2.set(drive);
-		            	}
-		            	else
-		            	{
-		            		state = TURN_STATE;
-		            	}
-		            } 
-		            else if(state == TURN_STATE)
-		            {
-		            	state = DRIVE_STATE;
-		            	DriveMotor1.set(0.25);
-		            	DriveMotor2.set(-0.25);*/
-		            }
-		            
-		            
-		           
-		            
+	
 		        
 		        
 		        
-	public void autoUpdate(){}
+	public void autoUpdate(){
+		
+	}
 
 }

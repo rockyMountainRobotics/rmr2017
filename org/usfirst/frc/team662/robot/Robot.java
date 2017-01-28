@@ -34,7 +34,7 @@ public class Robot extends SampleRobot {
 		components.add(new Gyroscope());
 		//components.add(new motor());
 		//components.add(new Solanoid());
-		//components.add(new Vision());
+		components.add(new Vision());
 		stick = new Joystick(0);
 		//components.add(new Switch());
 	}

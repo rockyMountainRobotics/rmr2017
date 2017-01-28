@@ -15,8 +15,8 @@ public class motor implements Component{
 	static final int OTHERMOT = 1;
 	
 
-	CANTalon DriveMotor1= new CANTalon(CANMOT);
-	CANTalon DriveMotor2= new CANTalon(OTHERMOT);
+	public  CANTalon DriveMotor1= new CANTalon(CANMOT);
+	public CANTalon DriveMotor2= new CANTalon(OTHERMOT);
 	
 	DigitalInput limitSwitch;
 	

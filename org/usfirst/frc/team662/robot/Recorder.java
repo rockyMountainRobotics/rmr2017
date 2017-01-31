@@ -22,7 +22,6 @@ public class Recorder implements Component{
 	Timer playingTimer = new Timer();
 	//The ui radio buttons. Also stores files with name.
 	SendableChooser<File> autoChooser = new SendableChooser<File>();
-	SendableChooser<Boolean> recordChooser = new SendableChooser<Boolean>();
 
 	//Some constants
 	static final String ALL_FILES = "autoFiles";
@@ -153,15 +152,18 @@ public class Recorder implements Component{
 			ObjectInputStream in = new ObjectInputStream(fileIn);
 			deSerialized = (ArrayList<Timings>) in.readObject();
 		} catch (IOException i) {
-			System.out.println(i);
+			System.err.println("There was a file retrieval error during the recording load sequence: " + i);
+			SmartDashboard.putBoolean("play recording", false);
 		} catch (ClassNotFoundException c) {
-			System.out.println(c);
+			System.err.println("There was a problem with the recording file: " + c);
+			SmartDashboard.putBoolean("play recording", false);
 		}
 		//This sorts the array by port. Needed to ensure that the timings and hardwares line up even if the order they are added changes.
 		//The play method checks this more.
 		deSerialized.sort((a, b) -> a.port - b.port);
 		return deSerialized;
 	}
+	
 	//Save the timings arraylist to a file
 	void saveRecording() {
 		//The file name according to the user
@@ -181,13 +183,13 @@ public class Recorder implements Component{
 			fileOut.close();
 		} catch (IOException i) {
 			//Shouldn't happen
-			System.out.println(i);
+			System.err.println("There was an error during the save recording sequence:" + i);
 		}
 	}
 	//Records movements done based on component values.
 	public void record(){
 		//This adds a .1 second delay since components shouldn't change much quicker.
-		if (GlobalTime.get() - lastTime > .1) {
+		if (true /*GlobalTime.get() - lastTime > .01*/) {
 			lastTime = GlobalTime.get();
 			//If this is the first time we are running the record code...
 			if (!hasFinished) {
@@ -207,14 +209,14 @@ public class Recorder implements Component{
 					previousTimerValue = gottenTimer.values.get(gottenTimer.values.size() - 1);
 				}
 				//Store the current value for the motor
-				Object currentMotorValue = gottenPiece.getter.get();
+				Object currentHardwareValue = gottenPiece.getter.get();
 				
 				
 				//Basically, we can't actually compare two plain objects because it will always be false. This casts it to whatever the subclass is
 				//There should be no time when the motor and its recordings should be of different type making this safe
 				/*System.out.println("Timer is: " + previousTimerValue.getClass().cast(previousTimerValue));
 				System.out.println("Motor is: " + currentMotorValue.getClass().cast(currentMotorValue));*/
-				if (gottenTimer.values.size() == 0 || !currentMotorValue.getClass().cast(currentMotorValue).equals(previousTimerValue.getClass().cast(previousTimerValue))) {
+				if (gottenTimer.values.size() == 0 || !currentHardwareValue.getClass().cast(currentHardwareValue).equals(previousTimerValue.getClass().cast(previousTimerValue))) {
 					//Add the current time and the value to the array.
 					gottenTimer.times.add(GlobalTime.get());
 					gottenTimer.values.add(gottenPiece.getter.get());
@@ -230,22 +232,27 @@ public class Recorder implements Component{
 		if (!hasLoaded) {
 			//Set our timers object equal to whatever gets loaded.
 			timers = loadSavedRecording();
+			hasLoaded = true;
 			//A check to ensure that we have the same hardware as we had when we recorded it
 			if (pieces.size() == timers.size()) {
 				for (int i = 0; i < pieces.size(); i++) {
 					if (pieces.get(i).port != timers.get(i).port) {
-						System.out.println("ERROR!!");
+						System.err.println("The port of piece number " + i + " does not match that of the recording.");
+						SmartDashboard.putBoolean("play recording", false);
+						hasLoaded = false;
+						return;
 					}
 				}
 				//Will be true until all playback has finished
-				hasLoaded = true;
 				playingTimer.stop();
 				playingTimer.reset();
 				playingTimer.start();
 				
 				
 			} else {
-				System.out.println("ERROR!!");
+				System.err.println("The number of pieces on the robot does not match that of the recording.");
+				SmartDashboard.putBoolean("play recording", false);
+				hasLoaded = false;
 			}
 		} else {
 			//If allDone is true at the end of the for loop, then everything is done.

@@ -14,9 +14,9 @@ public class motor implements Component{
 	static final int CANMOT = 0;
 	static final int OTHERMOT = 1;
 	
-
-	public  CANTalon DriveMotor1= new CANTalon(CANMOT);
-	public CANTalon DriveMotor2= new CANTalon(OTHERMOT);
+	public static boolean isInUse = false;
+	public static CANTalon DriveMotor1= new CANTalon(CANMOT);
+	public static CANTalon DriveMotor2= new CANTalon(OTHERMOT);
 	
 	DigitalInput limitSwitch;
 	
@@ -26,7 +26,7 @@ public class motor implements Component{
 	public void motoring(double speed, CANTalon DriveMotor1)
 	{
 		
-		if((speed >= .2 || speed <= -.2) && limitSwitch.get())
+		if((speed >= .2 || speed <= -.2) && limitSwitch.get()&& !isInUse)
 		{
 			DriveMotor1.set(speed);
 		}

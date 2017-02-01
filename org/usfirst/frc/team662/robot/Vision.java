@@ -9,7 +9,8 @@ import edu.wpi.first.wpilibj.vision.*;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 
-public class Vision implements Component{
+public class Vision implements Component
+{
 	final Object imgLock = new Object();
 	VisionThread vthread;
     UsbCamera camera;
@@ -21,102 +22,146 @@ public class Vision implements Component{
     final static double drive = .5;
     final static int DRIVE_STATE = 0;
     final static int TURN_STATE = 1;
-    int state = 0;
-    
+    public enum State
+    {
+    	LEFT, RIGHT, START, FINISH, CENTERED, WAITING
+    }
+    State state = State.WAITING;
     final static double driveMore = 0.25;
-    final static double driveLess = -0.25;
+    final static double driveLess = .1;
     final static int CENTER_THRESHOLD = 160;
     final static int LEFT_THRESHOLD = 80;
     final static int RIGHT_THRESHOLD = 240;
     final static int FINAL_HEIGHT = 20000000;
     int leftHeight;
+    int rightHeight;
 
 	public Vision() {
 	    camera = CameraServer.getInstance().startAutomaticCapture();
-	    
 	    //camera.setExposureManual(0);
 	    camera.setResolution(320,240);
 	    cameraServer.addCamera(camera);
 	    vthread = new VisionThread(camera, new GripPipeline(), pipeline -> {
-	            SmartDashboard.putNumber("rectangles",pipeline.filterContoursOutput().size());        
+	        SmartDashboard.putNumber("rectangles",pipeline.filterContoursOutput().size());
+			camera.setWhiteBalanceManual(0);
+			
+			int centerLeft;
+			int centerRight;
+	    		
+	    		
+	    		
+			Rect left = null;
+			Rect right = null;
+			if (pipeline.filterContoursOutput().size() >= 2){
+				left = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
+				right = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));
+			}
+			if (state == State.WAITING && motor.isInUse==false)
+			{
+				motor.isInUse=true;
+				state = State.START;
+				
+			}
+			if (state == State.START)
+			{
+				motor.DriveMotor1.set(-driveMore);
+				motor.DriveMotor2.set(driveMore);
+				if (left != null){
+					if (left.height > right.height){
+						state = State.LEFT;
+					}
+					if (left.height < right.height){
+						state = State.RIGHT;
+					}
+					if (left.height == right.height){
+						state = State.CENTERED;
+					}
+				}
+				
+			}
+			
+			if (state == State.LEFT){
+				motor.DriveMotor1.set(driveLess);
+				motor.DriveMotor2.set(driveMore);
+				
+				if (left.x > LEFT_THRESHOLD){
+					motor.DriveMotor1.set(driveMore);
+					motor.DriveMotor2.set(driveLess);
+				}
+				if (left.x < LEFT_THRESHOLD)
+				{
+					motor.DriveMotor1.set(driveLess);
+					motor.DriveMotor2.set(driveMore);
+					
+				}
+				else if(leftHeight >= FINAL_HEIGHT)
+				{
+				   	//Go forward
+					state = State.FINISH;
+					motor.DriveMotor1.set(0);
+					motor.DriveMotor2.set(0);
+				}
+				
+			}
+			if (state == State.RIGHT){
+				motor.DriveMotor1.set(driveMore);
+				motor.DriveMotor2.set(driveLess);
+				
+				if (right.x > RIGHT_THRESHOLD){
+					motor.DriveMotor1.set(driveLess);
+					motor.DriveMotor2.set(driveMore);
+				}
+				if (right.x < RIGHT_THRESHOLD)
+				{
+					motor.DriveMotor1.set(driveMore);
+					motor.DriveMotor2.set(driveLess);
+				}
+				else if(rightHeight >= FINAL_HEIGHT)
+				{
+				   	//Go forward
+					state = State.FINISH;
+					motor.DriveMotor1.set(0);
+					motor.DriveMotor2.set(0);
+				}
+				
+			}
+			if (state == State.CENTERED){
+				motor.DriveMotor1.set(driveMore);
+				motor.DriveMotor2.set(driveMore);
+				
+				if(leftHeight >= FINAL_HEIGHT)
+				{
+				   	//Go forward
+					state = State.FINISH;
+					motor.DriveMotor1.set(0);
+					motor.DriveMotor2.set(0);
+				}
+			}
+				
+			if (state == State.FINISH)
+			{
+				//Finished state
+				//Play finished recording where the gear is dropped and the robot goes back beeping and booping
+			}
+	    			    
 	    });
 	    vthread.start();
 	    
 	    
 	    
 	}
-	public void update(){
-		camera.setWhiteBalanceManual(0);
+	public void update()
+	{
+
+	}
+	public void autoUpdate()
+	{
 		
-		int centerLeft;
-		int centerRight;
-		
-		//VisionThread visthred = new VisionThread(camera, new GripPipeline(), pipeline -> {});
-		
-		 VisionThread visionThread = new VisionThread(camera, new GripPipeline(), pipeline -> {
-			 if (pipeline.filterContoursOutput().size() >= 2) {
-				 Rect left = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
-				 Rect right = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));		            
-				 SmartDashboard.putNumber("rectangles",pipeline.filterContoursOutput().size());
-				 
-				 centerLeft = left.x + (left.width / 2);
-				 centerRight = right.x + (right.width / 2);
-				 leftHeight = right.y;}
-			
-			
-			//Drive motor1 is left, two is right
-				 
-				
-				
-				
-				else if(centerLeft > LEFT_THRESHOLD && centerLeft < CENTER_THRESHOLD)
-				{
-				 
-				 DriveMotor1.set(driveLess);
-				 DriveMotor2.set(driveMore);
-				 
-				}
-				else if(centerLeft < LEFT_THRESHOLD)
-				{
-				 DriveMotor1.set(driveMore);
-				 DriveMotor2.set(driveLess);
-				}
-				else if(centerRight > RIGHT_THRESHOLD)
-				{
-				 DriveMotor1.set(driveLess);
-				 DriveMotor2.set(driveMore);
-				}
-				else if(centerRight < RIGHT_THRESHOLD && centerRight > CENTER_THRESHOLD)
-				{
-				 DriveMotor1.set(driveMore);
-				 DriveMotor2.set(driveLess);
-				}
-				 
-				
-				 //Stops the robot if it gets too close to the peg (peg pokes out 1 foot, maybe stop at 18 inches?)
-				else if(leftHeight >= FINAL_HEIGHT)
-				{
-			   	//Go forward
-					DriveMotor1.set(0);
-					DriveMotor2.set(0);
-				}
-			 
-			 else
-			{
-				
-				DriveMotor1.set(driveLess);
-				DriveMotor2.set(driveMore);
-				
-			}
-				
-			
-		        
+	}
 	
-		        
-		        
-		        
-	public void autoUpdate(){
-		
+	public void disable()
+	{
+		vthread.stop();
 	}
 
 }

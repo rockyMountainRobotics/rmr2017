@@ -31,10 +31,10 @@ public class Robot extends SampleRobot {
 
 	public Robot() {
 		components = new ArrayList<Component>();
-		components.add(new Gyroscope());
-		//components.add(new motor());
-		//components.add(new Solanoid());
-		components.add(new Vision());
+
+		components.add(new GearHolder());
+		components.add(new Drive());
+		
 		stick = new Joystick(0);
 		//components.add(new Switch());
 	}

@@ -25,15 +25,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
  * be much more difficult under this system. Use IterativeRobot or Command-Based
  * instead if you're new.
  */
+@SuppressWarnings("unused")
 public class Robot extends SampleRobot {
 	public static Joystick stick;
 	ArrayList<Component> components;
 
 	public Robot() {
+		stick = new Joystick(0);
+
 		components = new ArrayList<Component>();
 		components.add(new GearHolder());
 		components.add(new Drive());
-		stick = new Joystick(0);
+		components.add(new Recorder());
 	}
 
 	public void robotInit() {

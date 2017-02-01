@@ -46,4 +46,8 @@ public class GearHolder implements Component {
 	public void autoUpdate(){
 	//We wanted to add a rumble, but were too lazy.
 	}
+	@Override
+	public void disable() {
+		manipulatorMotor.set(0);
+	}
 }

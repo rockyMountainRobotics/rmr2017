@@ -99,5 +99,11 @@ public class Drive implements Component{
 	       }
 		return outputPower;
 	}
+
+	@Override
+	public void disable() {
+		left.set(0);
+		right.set(0);
+	}
 	
 }

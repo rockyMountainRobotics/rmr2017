@@ -187,6 +187,7 @@ public class Recorder implements Component{
 		}
 	}
 	//Records movements done based on component values.
+	@SuppressWarnings("unchecked")
 	public void record(){
 		//This adds a .1 second delay since components shouldn't change much quicker.
 		if (true /*GlobalTime.get() - lastTime > .01*/) {
@@ -227,6 +228,7 @@ public class Recorder implements Component{
 	}
 
 	//Called every time the robot updates and SmartDashboard button set. replays any action scheduled for the specific time
+	@SuppressWarnings("unchecked")
 	public void play() {
 		//Checks if this is the first time we have run this code since clicking the button.
 		if (!hasLoaded) {
@@ -286,8 +288,20 @@ public class Recorder implements Component{
 	
 	@Override
 	public void autoUpdate() {
-		// TODO Auto-generated method stub
-		
+		//play Recording
+		if (SmartDashboard.getBoolean("play recording", false)) {
+			play();
+		}
+	}
+
+	@Override
+	public void disable() {
+		SmartDashboard.putBoolean("play recording", false);
+		SmartDashboard.putBoolean("record", false);
+
+		hasLoaded = false;
+		lastTime = -1;
+		hasFinished = false;
 	}
 	
 }

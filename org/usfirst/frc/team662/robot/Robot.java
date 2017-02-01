@@ -1,5 +1,6 @@
 package org.usfirst.frc.team662.robot;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -7,6 +8,7 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This is a demo program showing the use of the RobotDrive class. The
@@ -27,9 +29,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
  */
 @SuppressWarnings("unused")
 public class Robot extends SampleRobot {
+	
+	
 	public static Joystick stick;
 	ArrayList<Component> components;
-
+	ArrayList<Component> disabled;
+	
 	public Robot() {
 		stick = new Joystick(0);
 
@@ -37,6 +42,16 @@ public class Robot extends SampleRobot {
 		components.add(new GearHolder());
 		components.add(new Drive());
 		components.add(new Recorder());
+		
+		//disable items
+		disabled = new ArrayList<Component>();
+		int counter = 0;
+		for(Component i : components){
+			SmartDashboard.putBoolean(i.getClass().getName(), true);
+			counter++;
+		}
+		
+		
 	}
 
 	public void robotInit() {
@@ -58,6 +73,16 @@ public class Robot extends SampleRobot {
 		while (isEnabled() && isAutonomous()) {
 			for (int i = components.size(); i >= 0; i--) {
 				components.get(i).autoUpdate();
+				if(!SmartDashboard.getBoolean(components.get(i).getClass().getName(), true)){
+					disabled.add(components.get(i));
+					components.get(i).disable();
+					components.remove(i);
+				}
+			}for(int i = disabled.size(); i >= 0; i--){
+				if(SmartDashboard.getBoolean(disabled.get(i).getClass().getName(), true)){
+					components.add(disabled.get(i));
+					disabled.remove(i);
+				}
 			}
 		}
 	}
@@ -69,7 +94,19 @@ public class Robot extends SampleRobot {
 		while (isOperatorControl() && isEnabled()) {
 			for (int i = components.size(); i >= 0; i--) {
 				components.get(i).update();
+				if(!SmartDashboard.getBoolean(components.get(i).getClass().getName(), true)){
+					disabled.add(components.get(i));
+					components.get(i).disable();
+					components.remove(i);
+				}
 			}
+			for(int i = disabled.size(); i >= 0; i--){
+				if(SmartDashboard.getBoolean(disabled.get(i).getClass().getName(), true)){
+					components.add(disabled.get(i));
+					disabled.remove(i);
+				}
+			}
+			
 		}
 	}
 

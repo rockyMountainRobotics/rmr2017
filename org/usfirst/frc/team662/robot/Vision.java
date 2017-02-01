@@ -56,16 +56,16 @@ public class Vision implements Component
 				left = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
 				right = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));
 			}
-			if (state == State.WAITING && motor.isInUse==false)
+			if (state == State.WAITING && Drive.isInUse==false)
 			{
-				motor.isInUse=true;
+				Drive.isInUse=true;
 				state = State.START;
 				
 			}
 			if (state == State.START)
 			{
-				motor.DriveMotor1.set(-driveMore);
-				motor.DriveMotor2.set(driveMore);
+				Drive.left.set(-driveMore);
+				Drive.right.set(driveMore);
 				if (left != null){
 					if (left.height > right.height){
 						state = State.LEFT;
@@ -81,60 +81,60 @@ public class Vision implements Component
 			}
 			
 			if (state == State.LEFT){
-				motor.DriveMotor1.set(driveLess);
-				motor.DriveMotor2.set(driveMore);
+				Drive.left.set(driveLess);
+				Drive.right.set(driveMore);
 				
 				if (left.x > LEFT_THRESHOLD){
-					motor.DriveMotor1.set(driveMore);
-					motor.DriveMotor2.set(driveLess);
+					Drive.left.set(driveMore);
+					Drive.right.set(driveLess);
 				}
 				if (left.x < LEFT_THRESHOLD)
 				{
-					motor.DriveMotor1.set(driveLess);
-					motor.DriveMotor2.set(driveMore);
+					Drive.left.set(driveLess);
+					Drive.right.set(driveMore);
 					
 				}
 				else if(leftHeight >= FINAL_HEIGHT)
 				{
 				   	//Go forward
 					state = State.FINISH;
-					motor.DriveMotor1.set(0);
-					motor.DriveMotor2.set(0);
+					Drive.left.set(0);
+					Drive.right.set(0);
 				}
 				
 			}
 			if (state == State.RIGHT){
-				motor.DriveMotor1.set(driveMore);
-				motor.DriveMotor2.set(driveLess);
+				Drive.left.set(driveMore);
+				Drive.right.set(driveLess);
 				
 				if (right.x > RIGHT_THRESHOLD){
-					motor.DriveMotor1.set(driveLess);
-					motor.DriveMotor2.set(driveMore);
+					Drive.left.set(driveLess);
+					Drive.right.set(driveMore);
 				}
 				if (right.x < RIGHT_THRESHOLD)
 				{
-					motor.DriveMotor1.set(driveMore);
-					motor.DriveMotor2.set(driveLess);
+					Drive.left.set(driveMore);
+					Drive.right.set(driveLess);
 				}
 				else if(rightHeight >= FINAL_HEIGHT)
 				{
 				   	//Go forward
 					state = State.FINISH;
-					motor.DriveMotor1.set(0);
-					motor.DriveMotor2.set(0);
+					Drive.left.set(0);
+					Drive.right.set(0);
 				}
 				
 			}
 			if (state == State.CENTERED){
-				motor.DriveMotor1.set(driveMore);
-				motor.DriveMotor2.set(driveMore);
+				Drive.left.set(driveMore);
+				Drive.right.set(driveMore);
 				
 				if(leftHeight >= FINAL_HEIGHT)
 				{
 				   	//Go forward
 					state = State.FINISH;
-					motor.DriveMotor1.set(0);
-					motor.DriveMotor2.set(0);
+					Drive.left.set(0);
+					Drive.right.set(0);
 				}
 			}
 				

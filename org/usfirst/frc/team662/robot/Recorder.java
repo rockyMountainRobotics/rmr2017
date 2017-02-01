@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -22,6 +25,7 @@ public class Recorder implements Component{
 	Timer playingTimer = new Timer();
 	//The ui radio buttons. Also stores files with name.
 	SendableChooser<File> autoChooser = new SendableChooser<File>();
+	SendableChooser<File> deleteChooser = new SendableChooser<File>();
 
 	//Some constants
 	static final String ALL_FILES = "autoFiles";
@@ -78,7 +82,8 @@ public class Recorder implements Component{
 	public Recorder() {
 		//Put the ui elements
 		SmartDashboard.putBoolean("record", false);
-		SmartDashboard.putString("input", "defaultAuto");
+		SmartDashboard.putBoolean("delete", false);
+		SmartDashboard.putString("name of file", "defaultAuto");
 
 		//Make sure our folders really exist
 		File records = new File(DIRECTORY);
@@ -97,6 +102,7 @@ public class Recorder implements Component{
 				else{
 					autoChooser.addObject(foundRecords[i].getName(), foundRecords[i]);
 				}
+				deleteChooser.addObject(foundRecords[i].getName(), foundRecords[i]);
 			}
 			//Also, put play related things on the ui
 			SmartDashboard.putData(ALL_FILES, autoChooser);
@@ -138,6 +144,11 @@ public class Recorder implements Component{
 		//play Recording
 		if (SmartDashboard.getBoolean("play recording", false)) {
 			play();
+		}
+		
+		//delete recording
+		if (SmartDashboard.getBoolean("delete recording", false)) {
+			delete();
 		}
 		
 	}
@@ -284,6 +295,12 @@ public class Recorder implements Component{
 			}
 		}
 			
+	}
+	
+	public void delete() {
+			//Delete the specified file
+			File deletionFile = deleteChooser.getSelected();
+			deletionFile.delete();
 	}
 	
 	@Override

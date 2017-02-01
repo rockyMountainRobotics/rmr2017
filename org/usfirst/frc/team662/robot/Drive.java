@@ -3,8 +3,9 @@ import edu.wpi.first.wpilibj.RobotDrive;
 
 public class Drive implements Component{
 	RobotDrive driver; 
-	DualTalon left;
-	DualTalon right;
+	public static DualTalon left;
+	public static DualTalon right;
+	public static boolean isInUse = false;
 	final static double LEFT_MULTIPLIER = 0.7;
 	final static double RIGHT_MULTIPLIER = -0.7;
 	final static double LEFT_DEADZONE = 0.15;
@@ -15,6 +16,7 @@ public class Drive implements Component{
 	final static int REAR_RIGHT_MOTOR = 5;
 
 	public Drive(){
+		
 		left = new DualTalon(FRONT_LEFT_MOTOR,REAR_LEFT_MOTOR);
 		right = new DualTalon(FRONT_RIGHT_MOTOR,REAR_RIGHT_MOTOR);
 		
@@ -71,9 +73,11 @@ public class Drive implements Component{
        rightMotorPower = limitMotor(rightMotorPower, highInput);
        
        //set the motors to power variables
-       left.set(leftMotorPower);
-       right.set(rightMotorPower);
-	
+       if(isInUse == !isInUse){
+    	   left.set(leftMotorPower);
+    	   right.set(rightMotorPower);
+       }
+              
 	}
 	
 	//determines which of two inputs is greater, and returns it

@@ -18,7 +18,7 @@ public class Vision implements Component
     double ratior = 0;
 	CameraServer cameraServer = CameraServer.getInstance();
 	
-
+	public static boolean startRobot = false;
     final static double drive = .5;
     final static int DRIVE_STATE = 0;
     final static int TURN_STATE = 1;
@@ -48,6 +48,7 @@ public class Vision implements Component
 			int centerLeft;
 			int centerRight;
 	    		
+	    	Robot.stick.getRawButton(XboxMap.START);
 	    		
 	    		
 			Rect left = null;
@@ -56,6 +57,9 @@ public class Vision implements Component
 				left = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
 				right = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));
 			}
+			//Needs check a variable/button
+			
+			
 			if (state == State.WAITING && Drive.isInUse==false)
 			{
 				Drive.isInUse=true;
@@ -64,65 +68,77 @@ public class Vision implements Component
 			}
 			if (state == State.START)
 			{
-				Drive.left.set(-driveMore);
-				Drive.right.set(driveMore);
-				if (left != null){
-					if (left.height > right.height){
+
+				if (left != null)
+				{
+					if (left.height > right.height)
+					{
 						state = State.LEFT;
 					}
-					if (left.height < right.height){
+					if (left.height < right.height)
+					{
 						state = State.RIGHT;
 					}
-					if (left.height == right.height){
+					if (left.height == right.height)
+					{
 						state = State.CENTERED;
 					}
 				}
-				
-			}
-			
-			if (state == State.LEFT){
-				Drive.left.set(driveLess);
-				Drive.right.set(driveMore);
-				
-				if (left.x > LEFT_THRESHOLD){
+				else
+				{
 					Drive.left.set(driveMore);
 					Drive.right.set(driveLess);
 				}
-				if (left.x < LEFT_THRESHOLD)
-				{
-					Drive.left.set(driveLess);
-					Drive.right.set(driveMore);
-					
-				}
-				else if(leftHeight >= FINAL_HEIGHT)
-				{
-				   	//Go forward
-					state = State.FINISH;
-					Drive.left.set(0);
-					Drive.right.set(0);
-				}
 				
+			}// :)
+			
+			if (state == State.LEFT)
+			{
+				if (left != null)
+				{
+					if (left.x > LEFT_THRESHOLD){
+						Drive.left.set(driveLess);
+						Drive.right.set(driveMore);
+					}
+					if (left.x <= LEFT_THRESHOLD)
+					{
+						Drive.left.set(driveMore);
+						Drive.right.set(driveLess);
+						
+					}
+					if(leftHeight >= FINAL_HEIGHT)
+					{
+					   	//Go forward
+						state = State.FINISH;
+						Drive.left.set(0);
+						Drive.right.set(0);
+					}
+				}	
 			}
 			if (state == State.RIGHT){
-				Drive.left.set(driveMore);
-				Drive.right.set(driveLess);
+				if (left != null)
+				{
+					if (right.x > RIGHT_THRESHOLD){
+						Drive.left.set(driveLess);
+						Drive.right.set(driveMore);
+					}
+					if (right.x <= RIGHT_THRESHOLD)
+					{
+						Drive.left.set(driveMore);
+						Drive.right.set(driveLess);
+					}
+					if(rightHeight >= FINAL_HEIGHT)
+					{
+					   	//Go forward
+						state = State.FINISH;
+						Drive.left.set(0);
+						Drive.right.set(0);
+					}
+
+				}
 				
-				if (right.x > RIGHT_THRESHOLD){
-					Drive.left.set(driveLess);
-					Drive.right.set(driveMore);
-				}
-				if (right.x < RIGHT_THRESHOLD)
-				{
-					Drive.left.set(driveMore);
-					Drive.right.set(driveLess);
-				}
-				else if(rightHeight >= FINAL_HEIGHT)
-				{
-				   	//Go forward
-					state = State.FINISH;
-					Drive.left.set(0);
-					Drive.right.set(0);
-				}
+				
+				
 				
 			}
 			if (state == State.CENTERED){

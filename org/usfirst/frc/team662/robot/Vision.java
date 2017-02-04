@@ -206,9 +206,11 @@ public class Vision implements Component
 				
 			if (state == State.FINISH)
 			{
-				//Finished state
-				//Play finished recording where the gear is dropped and the robot goes back beeping and booping
 				
+				
+				
+				//start recorder set something on smart dashboard, set right radio button,check for hasLoaded to become true, check for it to turn false again. ONce it is false, set state to waiting.
+				SmartDashboard.putBoolean("play recording", true);
 			}
 	    			    
 	    });

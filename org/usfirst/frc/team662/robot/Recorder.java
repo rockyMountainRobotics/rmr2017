@@ -11,6 +11,8 @@ import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -26,6 +28,8 @@ public class Recorder implements Component{
 	//The ui radio buttons. Also stores files with name.
 	SendableChooser<File> autoChooser = new SendableChooser<File>();
 	SendableChooser<File> deleteChooser = new SendableChooser<File>();
+	
+	Map allFound;
 
 	//Some constants
 	static final String ALL_FILES = "autoFiles";
@@ -102,6 +106,7 @@ public class Recorder implements Component{
 				else{
 					autoChooser.addObject(foundRecords[i].getName(), foundRecords[i]);
 				}
+				allFound.put(foundRecords[i].getName(), foundRecords[i]);
 				deleteChooser.addObject(foundRecords[i].getName(), foundRecords[i]);
 			}
 			//Also, put play related things on the ui
@@ -143,7 +148,7 @@ public class Recorder implements Component{
 
 		//play Recording
 		if (SmartDashboard.getBoolean("play recording", false)) {
-			play();
+			play(autoChooser.getSelected());
 		}
 		
 		//delete recording
@@ -153,13 +158,13 @@ public class Recorder implements Component{
 		
 	}
 	//Load whatever the saved file is
-	ArrayList loadSavedRecording() {
+	ArrayList loadSavedRecording(File fileToLoad) {
 		//Create where we will save the loaded thing
 		ArrayList<Timings> deSerialized = new ArrayList<Timings>();
 
 		try {
 			//File stuff. Create input stream based on the file from the chooser on smartDashboard
-			FileInputStream fileIn = new FileInputStream(autoChooser.getSelected());
+			FileInputStream fileIn = new FileInputStream(fileToLoad);
 			ObjectInputStream in = new ObjectInputStream(fileIn);
 			deSerialized = (ArrayList<Timings>) in.readObject();
 		} catch (IOException i) {
@@ -240,11 +245,11 @@ public class Recorder implements Component{
 
 	//Called every time the robot updates and SmartDashboard button set. replays any action scheduled for the specific time
 	@SuppressWarnings("unchecked")
-	public void play() {
+	public void play(File fileToLoad) {
 		//Checks if this is the first time we have run this code since clicking the button.
 		if (!hasLoaded) {
 			//Set our timers object equal to whatever gets loaded.
-			timers = loadSavedRecording();
+			timers = loadSavedRecording(fileToLoad);
 			hasLoaded = true;
 			//A check to ensure that we have the same hardware as we had when we recorded it
 			if (pieces.size() == timers.size()) {

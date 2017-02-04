@@ -8,10 +8,16 @@ public class Shifter implements Component{
 	boolean one = true;
 	boolean past = false;
 	
+	public Shifter(){
+		
+		Recorder.addRecordable(() -> solenoid.get(), (extended) -> solenoid.set((boolean)extended), SOLENOID_PORT);
+		
+	}
+	
 	public void update(){
 		one = Robot.stick.getRawButton(XboxMap.B);
 		
-		if(one == true && past == false){
+		if(one == true && past == false && Recorder.hasLoaded){
 			solenoid.set(!solenoid.get());
 		}
 		

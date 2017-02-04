@@ -22,9 +22,8 @@ public class Drive implements Component{
 		
 		left.setMultiplier(LEFT_MULTIPLIER);
 		right.setMultiplier(RIGHT_MULTIPLIER);
-				
-		//driver = new RobotDrive(left,right);
 		
+		//driver = new RobotDrive(left,right);
 		
 	}
 	
@@ -73,7 +72,7 @@ public class Drive implements Component{
        rightMotorPower = limitMotor(rightMotorPower, highInput);
        
        //set the motors to power variables
-       if(isInUse == !isInUse){
+       if(isInUse == !isInUse && Recorder.hasLoaded){
     	   left.set(leftMotorPower);
     	   right.set(rightMotorPower);
        }

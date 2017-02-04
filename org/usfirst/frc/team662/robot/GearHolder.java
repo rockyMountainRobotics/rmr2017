@@ -22,6 +22,12 @@ public class GearHolder implements Component {
 
 	double liftSpeed = 0;
 	
+	public GearHolder(){
+		
+		Recorder.addRecordable(() -> manipulatorMotor.get(), (speed) -> check((double)speed), MANIPULATOR_MOTOR_PORT_2);
+		
+	}
+	
 	public void update(){
 		boolean topLimit= true;
 		topLimit = limitSwitchTop.get();
@@ -30,17 +36,18 @@ public class GearHolder implements Component {
 		bottomLimit = limitSwitchBottom.get();
 		
 		liftSpeed = ManipulatorStick.getRawAxis(XboxMap.RIGHT_JOY_HORIZ);
-		
-		if (liftSpeed < DEADZONE_1|| liftSpeed > DEADZONE_2){
-			manipulatorMotor.set(liftSpeed);
-		}
-		
-		if (!topLimit && liftSpeed > 0){
-			manipulatorMotor.set(0);
-		}
-		
-		if (!bottomLimit && liftSpeed < 0){
-			manipulatorMotor.set(0);
+		if(Recorder.hasLoaded){
+			if (liftSpeed < DEADZONE_1|| liftSpeed > DEADZONE_2){
+				manipulatorMotor.set(liftSpeed);
+			}
+			
+			if (!topLimit && liftSpeed > 0){
+				manipulatorMotor.set(0);
+			}
+			
+			if (!bottomLimit && liftSpeed < 0){
+				manipulatorMotor.set(0);
+			}
 		}
 	}
 	public void autoUpdate(){
@@ -50,4 +57,15 @@ public class GearHolder implements Component {
 	public void disable() {
 		manipulatorMotor.set(0);
 	}
+	public void check(double speed) {
+		
+		if(!limitSwitchTop.get() && liftSpeed > 0){
+			speed = 0;
+		}
+		if(!limitSwitchBottom.get() && liftSpeed < 0){
+			speed = 0;		
+		}
+		manipulatorMotor.set(speed);
+	}
+	
 }

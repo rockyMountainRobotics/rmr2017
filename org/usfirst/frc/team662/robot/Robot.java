@@ -44,7 +44,7 @@ public class Robot extends SampleRobot {
 		components = new ArrayList<Component>();
 		components.add(new GearHolder());
 		components.add(new Drive());
-		components.add(new Recorder());
+		//components.add(new Recorder());
 		
 		//disable items
 		disabled = new ArrayList<Component>();

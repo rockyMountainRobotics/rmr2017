@@ -6,13 +6,13 @@ public class Drive implements Component{
 	DualTalon left;
 	DualTalon right;
 	final static double LEFT_MULTIPLIER = 0.7;
-	final static double RIGHT_MULTIPLIER = -0.7;
+	final static double RIGHT_MULTIPLIER = 0.7;
 	final static double LEFT_DEADZONE = 0.15;
 	final static double RIGHT_DEADZONE = 0.15;
-	final static int FRONT_LEFT_MOTOR = 4;
-	final static int REAR_LEFT_MOTOR = 6;
-	final static int FRONT_RIGHT_MOTOR = 3;
-	final static int REAR_RIGHT_MOTOR = 5;
+	final static int FRONT_LEFT_MOTOR = 5;
+	final static int REAR_LEFT_MOTOR = 3;
+	final static int FRONT_RIGHT_MOTOR = 6;
+	final static int REAR_RIGHT_MOTOR = 8;
 
 	public Drive(){
 		left = new DualTalon(FRONT_LEFT_MOTOR,REAR_LEFT_MOTOR);

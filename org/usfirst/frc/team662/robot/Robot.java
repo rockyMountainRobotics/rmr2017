@@ -3,6 +3,8 @@ package org.usfirst.frc.team662.robot;
 import java.io.File;
 import java.util.ArrayList;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SampleRobot;
@@ -32,6 +34,7 @@ public class Robot extends SampleRobot {
 	
 	
 	public static Joystick stick;
+	Compressor compress = new Compressor(0);
 	ArrayList<Component> components;
 	ArrayList<Component> disabled;
 	
@@ -39,9 +42,9 @@ public class Robot extends SampleRobot {
 		stick = new Joystick(0);
 
 		components = new ArrayList<Component>();
-		components.add(new GearHolder());
+		//components.add(new GearHolder());
 		components.add(new Drive());
-		components.add(new Recorder());
+		//components.add(new Recorder());
 		
 		//disable items
 		disabled = new ArrayList<Component>();
@@ -69,9 +72,11 @@ public class Robot extends SampleRobot {
 	 * if-else structure below with additional strings. If using the
 	 * SendableChooser make sure to add them to the chooser code above as well.
 	 */
+	
+	//Air on 0 1 is auto
 	public void autonomous() {
 		while (isEnabled() && isAutonomous()) {
-			for (int i = components.size(); i >= 0; i--) {
+			for (int i = components.size() - 1; i >= 0; i--) {
 				components.get(i).autoUpdate();
 				if(!SmartDashboard.getBoolean(components.get(i).getClass().getName(), true)){
 					disabled.add(components.get(i));
@@ -90,9 +95,16 @@ public class Robot extends SampleRobot {
 	/**
 	 * Runs the motors with arcade steering.
 	 */
+	DigitalInput compressor = new DigitalInput(0);
 	public void operatorControl() {
 		while (isOperatorControl() && isEnabled()) {
-			for (int i = components.size(); i >= 0; i--) {
+			if (compressor.get()){
+				compress.start();
+			}
+			else{
+				compress.stop();
+			}
+			for (int i = components.size() - 1; i >= 0; i--) {
 				components.get(i).update();
 				if(!SmartDashboard.getBoolean(components.get(i).getClass().getName(), true)){
 					disabled.add(components.get(i));
@@ -100,7 +112,7 @@ public class Robot extends SampleRobot {
 					components.remove(i);
 				}
 			}
-			for(int i = disabled.size(); i >= 0; i--){
+			for(int i = disabled.size() - 1; i >= 0; i--){
 				if(SmartDashboard.getBoolean(disabled.get(i).getClass().getName(), true)){
 					components.add(disabled.get(i));
 					disabled.remove(i);

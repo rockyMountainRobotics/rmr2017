@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.Joystick;
 
 
 public class ClimbingMotor implements Component {
-	final static int PORT_CLIMING_MOTOR = 5, PORT_CONTROLLER = 1;
+	final static int PORT_CLIMING_MOTOR = 1, PORT_CONTROLLER = 1; //Another 0
 	CANTalon motor = new CANTalon(PORT_CLIMING_MOTOR);
 	Joystick Joystick1 = new Joystick(PORT_CONTROLLER);
 	final static double DeadZone=.2;

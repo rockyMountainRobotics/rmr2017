@@ -8,7 +8,7 @@ public class GearHolder implements Component {
 	final static int LIMIT_SWITCH_CHANNEL_1 = 0;
 	final static int LIMIT_SWITCH_CHANNEL_2 = 0;
 	final static int JOYSTICK_PORT_1 = 0;
-	final static int MANIPULATOR_MOTOR_PORT_2 = 2;
+	final static int MANIPULATOR_MOTOR_PORT_2 = 7;
 	
 	final static double DEADZONE_1 = -.5;
 	final static double DEADZONE_2 = .5;

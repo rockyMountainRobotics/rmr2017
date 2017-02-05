@@ -78,7 +78,7 @@ public class Robot extends SampleRobot {
 					components.get(i).disable();
 					components.remove(i);
 				}
-			}for(int i = disabled.size(); i >= 0; i--){
+			}for(int i = disabled.size() - 1; i >= 0; i--){
 				if(SmartDashboard.getBoolean(disabled.get(i).getClass().getName(), true)){
 					components.add(disabled.get(i));
 					disabled.remove(i);

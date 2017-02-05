@@ -17,7 +17,7 @@ public class Vision implements Component
     double ratiol = 0;
     double ratior = 0;
 	CameraServer cameraServer = CameraServer.getInstance();
-	
+	final static String VISION_FILE_NAME = "vision";
 	
 	public static boolean startRobot = false;
     final static double drive = .5;
@@ -55,36 +55,34 @@ public class Vision implements Component
 	    	}
 	    	//Check if height is larger than width
 	    	
-	    	//Sets left and right rekts as null
+	    	//Sets left and right rects as null
 			Rect left = null;
 			Rect right = null;
 			
-			//Please comment what you guys did here 1=1=1=1=1=1=1=1=1=1=1
+			//Please comment what you guys did here 
 			if (pipeline.filterContoursOutput().size() >= 2){
-				left = Imgproc.boundingRect(pipeline.filterContoursOutput().get(0));
-				right = Imgproc.boundingRect(pipeline.filterContoursOutput().get(1));
 				for(int i = 0 ; i < pipeline.filterContoursOutput().size(); i++)
 				{
-					//Checks how many rektangles the robot sees
-					Rect checkRekt  = Imgproc.boundingRect(pipeline.filterContoursOutput().get(i));
+					//Checks how many rectangles the robot sees
+					Rect checkrect  = Imgproc.boundingRect(pipeline.filterContoursOutput().get(i));
 					
-					//Makes sure we are seeing the correct rektangles (not the ones on the furnace)
-					if (checkRekt.height > checkRekt.width)
+					//Makes sure we are seeing the correct rectangles (not the ones on the furnace)
+					if (checkrect.height > checkrect.width)
 						{
 							if (left == null)
 							{
-								left = checkRekt;
+								left = checkrect;
 							}
 							else
 							{
-								right = checkRekt;
+								right = checkrect;
 							}
 							
 						}
 					
 				}
 				
-				//If the robot didnt see two rektangles, it sets both to null until Vision is called again
+				//If the robot didnt see two rectangles, it sets both to null until Vision is called again
 				if (left == null || right == null)
 				{
 					left = null;
@@ -94,7 +92,7 @@ public class Vision implements Component
 			
 			
 			//Checks to make sure that the robot is not on yet, and if it isn't, it turns the robot on.
-			if (state == State.WAITING && !Drive.isInUse && startRobot)
+			if (state == State.WAITING && !Drive.isInUse && startRobot && !Recorder.isRecordingPlaying)
 			{
 				Drive.isInUse=true;
 				state = State.START;
@@ -106,23 +104,23 @@ public class Vision implements Component
 				//Makes sure that the robot sees the rectangles.
 				if (left != null)
 				{
-					//Checks if the left rektangle is closer than the right triangle, and if it is, sets the robot's state to LEFT.
+					//Checks if the left rectangle is closer than the right triangle, and if it is, sets the robot's state to LEFT.
 					if (left.height > right.height)
 					{
 						state = State.LEFT;
 					}
-					//Checks if the right rektangle is closer from the robot than the left triangle, and if it is, sets the robot's state to RIGHT.
+					//Checks if the right rectangle is closer from the robot than the left triangle, and if it is, sets the robot's state to RIGHT.
 					if (left.height < right.height)
 					{
 						state = State.RIGHT;
 					}
-					//Checks if the robot is perfectly centered between the two rectangles, and if it is, sets the robot's state to CENTERED.
-					if (left.height == right.height)
+					//Checks if both widths are the same, and if they are, sets state to CENTERED.
+					if (left.width == right.width)
 					{
 						state = State.CENTERED;
 					}
 				}
-				//If the robot can't see either rektangle, this spins the robot until it can see the rektangles.
+				//If the robot can't see either rectangle, this spins the robot until it can see the rectangles.
 				else
 				{
 					Drive.left.set(driveMore);
@@ -131,10 +129,10 @@ public class Vision implements Component
 				
 			}// :)
 			
-			//If the robot is closer to the left rektangle than the right rektangle, its state becomes LEFT
+			//If the robot is closer to the left rectangle than the right rectangle, its state becomes LEFT
 			if (state == State.LEFT)
 			{
-				//As long as the robot can see the rektangles,
+				//As long as the robot can see the rectangles,
 				if (left != null)
 				{
 					//If the robot sees between the left threshold (80 pixels) and the center (160 pixels), the robot turns to the right.
@@ -157,11 +155,16 @@ public class Vision implements Component
 						Drive.left.set(0);
 						Drive.right.set(0);
 					}
+					
+					if (left.width <= right.width)
+					{
+						state = State.CENTERED;
+					}
 				}	
 			}
-			//If the robot is closer to the right rektangle than the left rectangle, its state becomes RIGHT
+			//If the robot is closer to the right rectangle than the left rectangle, its state becomes RIGHT
 			if (state == State.RIGHT){
-				//As long as the robot can see the rektangles,
+				//As long as the robot can see the rectangles,
 				if (left != null)
 				{
 					//If the robot sees between the right threshold (240 pixels) and the right edge (320 pixels), the robot turns to the right.
@@ -183,6 +186,13 @@ public class Vision implements Component
 						Drive.left.set(0);
 						Drive.right.set(0);
 					}
+					
+					if (left.width >= right.width)
+					{
+						state = State.CENTERED;
+					}
+					
+				
 
 				}
 
@@ -190,9 +200,29 @@ public class Vision implements Component
 			//If the robot is perfectly centered already, its state is set to CENTERED
 			if (state == State.CENTERED)
 			{
+				//If the robot is facing too far to the right, it will turn to the left
+				if (Math.abs(CENTER_THRESHOLD - left.x) < Math.abs(right.x - CENTER_THRESHOLD))
+				{
+					Drive.left.set(driveMore);
+					Drive.right.set(driveLess);
+				}
+				//If the robot is facing too far to the left, it will turn to the right
+				if (Math.abs(CENTER_THRESHOLD - left.x) > Math.abs(right.x - CENTER_THRESHOLD))
+				{
+					Drive.left.set(driveLess);
+					Drive.right.set(driveMore);
+				}
+				//If the robot is centered, it will drive forward
+				if (Math.abs(CENTER_THRESHOLD - left.x) == Math.abs(right.x - CENTER_THRESHOLD))
+				{
+					Drive.left.set(driveMore);
+					Drive.right.set(driveMore);
+				}
+				
 				//Moves the robot straight forward (its centered already).
 				Drive.left.set(driveMore);
 				Drive.right.set(driveMore);
+				
 				
 				//If the robot gets within a certain distance of the peg, it runs a recorder program through the FINISH state.
 				if(leftHeight >= FINAL_HEIGHT)
@@ -203,12 +233,29 @@ public class Vision implements Component
 					Drive.right.set(0);
 				}
 			}
-				
+				//Plays file "vision", waits, sets isInUse to false
 			if (state == State.FINISH)
 			{
-				//Finished state
-				//Play finished recording where the gear is dropped and the robot goes back beeping and booping
-				
+				//If the robot is facing right, it will spin to the left
+				if (Math.abs(CENTER_THRESHOLD - left.x) < Math.abs(right.x - CENTER_THRESHOLD))
+				{
+					Drive.left.set(-driveMore);
+					Drive.right.set(driveMore);
+				}
+				//If the robot is facing left, it will spin to the right
+				if (Math.abs(CENTER_THRESHOLD - left.x) > Math.abs(right.x - CENTER_THRESHOLD))
+				{
+					Drive.left.set(driveMore);
+					Drive.right.set(-driveMore);
+				}
+				//If the robot is facing the center, it stops
+				if (Math.abs(CENTER_THRESHOLD - left.x) == Math.abs(right.x - CENTER_THRESHOLD))
+				{
+					Recorder.initializePlay(Recorder.allFound.get(VISION_FILE_NAME));
+					SmartDashboard.putBoolean("playing", true);
+					state = State.WAITING;
+					Drive.isInUse = false;
+				}
 			}
 	    			    
 	    });

@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -24,12 +25,12 @@ public class Recorder implements Component{
 
 	//Timers used for recording and playing
 	Timer GlobalTime = new Timer();
-	Timer playingTimer = new Timer();
+	static Timer playingTimer = new Timer();
 	//The ui radio buttons. Also stores files with name.
 	SendableChooser<File> autoChooser = new SendableChooser<File>();
 	SendableChooser<File> deleteChooser = new SendableChooser<File>();
 	
-	Map allFound;
+	public static Map<String, File> allFound;
 
 	//Some constants
 	static final String ALL_FILES = "autoFiles";
@@ -39,7 +40,7 @@ public class Recorder implements Component{
 	double lastTime = -1;
 	boolean hasFinished = false;
 	//Used for the player
-	public static boolean hasLoaded = false;
+	public static boolean isRecordingPlaying = false;
 
 
 	static class Hardware {
@@ -95,6 +96,7 @@ public class Recorder implements Component{
 		
 		//Get all files in the directory
 		File[] foundRecords = records.listFiles();
+		allFound = new HashMap<String, File>();
 		
 		//Did we find anything?
 		if (foundRecords != null && foundRecords.length != 0) {
@@ -148,7 +150,11 @@ public class Recorder implements Component{
 
 		//play Recording
 		if (SmartDashboard.getBoolean("play recording", false)) {
-			play(autoChooser.getSelected());
+			if(isRecordingPlaying){
+				play();
+			} else {
+				initializePlay(autoChooser.getSelected());				
+			}
 		}
 		
 		//delete recording
@@ -158,7 +164,7 @@ public class Recorder implements Component{
 		
 	}
 	//Load whatever the saved file is
-	ArrayList loadSavedRecording(File fileToLoad) {
+	static ArrayList loadSavedRecording(File fileToLoad) {
 		//Create where we will save the loaded thing
 		ArrayList<Timings> deSerialized = new ArrayList<Timings>();
 
@@ -243,62 +249,67 @@ public class Recorder implements Component{
 				
 	}
 
+	
+	public static void initializePlay(File fileToLoad){
+		
+		//Set our timers object equal to whatever gets loaded.
+		timers = loadSavedRecording(fileToLoad);
+		isRecordingPlaying = true;
+		//A check to ensure that we have the same hardware as we had when we recorded it
+		if (pieces.size() == timers.size()) {
+			for (int i = 0; i < pieces.size(); i++) {
+				if (pieces.get(i).port != timers.get(i).port) {
+					System.err.println("The port of piece number " + i + " does not match that of the recording.");
+					SmartDashboard.putBoolean("play recording", false);
+					isRecordingPlaying = false;
+					return;
+				}
+			}
+			//Will be true until all playback has finished
+			playingTimer.stop();
+			playingTimer.reset();
+			playingTimer.start();
+			
+			
+		} else {
+			System.err.println("The number of pieces on the robot does not match that of the recording.");
+			SmartDashboard.putBoolean("play recording", false);
+			isRecordingPlaying = false;
+		}
+	
+
+	}
 	//Called every time the robot updates and SmartDashboard button set. replays any action scheduled for the specific time
 	@SuppressWarnings("unchecked")
-	public void play(File fileToLoad) {
+	public void play() {
 		//Checks if this is the first time we have run this code since clicking the button.
-		if (!hasLoaded) {
-			//Set our timers object equal to whatever gets loaded.
-			timers = loadSavedRecording(fileToLoad);
-			hasLoaded = true;
-			//A check to ensure that we have the same hardware as we had when we recorded it
-			if (pieces.size() == timers.size()) {
-				for (int i = 0; i < pieces.size(); i++) {
-					if (pieces.get(i).port != timers.get(i).port) {
-						System.err.println("The port of piece number " + i + " does not match that of the recording.");
-						SmartDashboard.putBoolean("play recording", false);
-						hasLoaded = false;
-						return;
-					}
+		 
+		//If allDone is true at the end of the for loop, then everything is done.
+		boolean allDone = true;
+		for(int i = 0; i < pieces.size(); i++){
+			//The Timings object currently checking in the arrayList		
+			Timings currentTimeChecking = timers.get(i);
+			
+			//If we haven't already done every action that was recorded, keep playing.
+			if (currentTimeChecking.index < currentTimeChecking.times.size()){
+				//Since we still have stuff to do, we aren't all done
+				allDone = false;
+				//Check if we have reached the time for the next event
+				if(currentTimeChecking.times.get(currentTimeChecking.index) <= playingTimer.get()){
+					//Set the motor value to whatever the recording was at this time. Also add one to index.
+					pieces.get(i).setter.accept(currentTimeChecking.values.get(currentTimeChecking.index));
+					currentTimeChecking.index++;
+					
 				}
-				//Will be true until all playback has finished
-				playingTimer.stop();
-				playingTimer.reset();
-				playingTimer.start();
-				
-				
-			} else {
-				System.err.println("The number of pieces on the robot does not match that of the recording.");
-				SmartDashboard.putBoolean("play recording", false);
-				hasLoaded = false;
-			}
-		} else {
-			//If allDone is true at the end of the for loop, then everything is done.
-			boolean allDone = true;
-			for(int i = 0; i < pieces.size(); i++){
-				//The Timings object currently checking in the arrayList		
-				Timings currentTimeChecking = timers.get(i);
-				
-				//If we haven't already done every action that was recorded, keep playing.
-				if (currentTimeChecking.index < currentTimeChecking.times.size()){
-					//Since we still have stuff to do, we aren't all done
-					allDone = false;
-					//Check if we have reached the time for the next event
-					if(currentTimeChecking.times.get(currentTimeChecking.index) <= playingTimer.get()){
-						//Set the motor value to whatever the recording was at this time. Also add one to index.
-						pieces.get(i).setter.accept(currentTimeChecking.values.get(currentTimeChecking.index));
-						currentTimeChecking.index++;
-						
-					}
-				}
-			}
-			//If this is true, then every component has passed the final event.
-			if (allDone){
-				//Reset everything back
-				hasLoaded = false;
-				SmartDashboard.putBoolean("play recording", false);
 			}
 		}
+		//If this is true, then every component has passed the final event.
+		if (allDone){
+			//Reset everything back
+			isRecordingPlaying = false;
+			SmartDashboard.putBoolean("play recording", false);
+		}
+
 			
 	}
 	
@@ -312,7 +323,11 @@ public class Recorder implements Component{
 	public void autoUpdate() {
 		//play Recording
 		if (SmartDashboard.getBoolean("play recording", false)) {
-			play();
+			if(isRecordingPlaying){
+				play();
+			} else {
+				initializePlay(autoChooser.getSelected());
+			}
 		}
 	}
 
@@ -321,7 +336,7 @@ public class Recorder implements Component{
 		SmartDashboard.putBoolean("play recording", false);
 		SmartDashboard.putBoolean("record", false);
 
-		hasLoaded = false;
+		isRecordingPlaying = false;
 		lastTime = -1;
 		hasFinished = false;
 	}

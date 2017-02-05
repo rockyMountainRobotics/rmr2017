@@ -33,7 +33,7 @@ public class Vision implements Component
     final static int CENTER_THRESHOLD = 160;
     final static int LEFT_THRESHOLD = 80;
     final static int RIGHT_THRESHOLD = 240;
-    final static int FINAL_HEIGHT = 2000000000;
+    final static int FINAL_HEIGHT = 20000000;
     int leftHeight;
     int rightHeight;
 
@@ -128,7 +128,6 @@ public class Vision implements Component
 				}
 				
 			}// :)
-			
 			//If the robot is closer to the left rectangle than the right rectangle, its state becomes LEFT
 			if (state == State.LEFT)
 			{
@@ -225,6 +224,7 @@ public class Vision implements Component
 				
 				
 				//If the robot gets within a certain distance of the peg, it runs a recorder program through the FINISH state.
+
 				if(leftHeight >= FINAL_HEIGHT)
 				{
 				   	//Go forward
@@ -272,7 +272,7 @@ public class Vision implements Component
 	{
 		
 		startRobot = true;
-		
+
 	}
 	
 	public void disable()

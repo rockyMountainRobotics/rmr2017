@@ -39,6 +39,7 @@ public class Robot extends SampleRobot {
 		stick = new Joystick(0);
 
 		components = new ArrayList<Component>();
+
 		components.add(new GearHolder());
 		components.add(new Drive());
 		components.add(new Recorder());
@@ -50,8 +51,6 @@ public class Robot extends SampleRobot {
 			SmartDashboard.putBoolean(i.getClass().getName(), true);
 			counter++;
 		}
-		
-		
 	}
 
 	public void robotInit() {

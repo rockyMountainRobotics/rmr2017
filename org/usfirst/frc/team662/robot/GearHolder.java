@@ -36,7 +36,7 @@ public class GearHolder implements Component {
 		bottomLimit = limitSwitchBottom.get();
 		
 		liftSpeed = ManipulatorStick.getRawAxis(XboxMap.RIGHT_JOY_HORIZ);
-		if(Recorder.hasLoaded){
+		if(Recorder.isRecordingPlaying){
 			if (liftSpeed < DEADZONE_1|| liftSpeed > DEADZONE_2){
 				manipulatorMotor.set(liftSpeed);
 			}

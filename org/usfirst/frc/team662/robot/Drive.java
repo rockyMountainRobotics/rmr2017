@@ -72,7 +72,7 @@ public class Drive implements Component{
        rightMotorPower = limitMotor(rightMotorPower, highInput);
        
        //set the motors to power variables
-       if(isInUse == !isInUse && Recorder.hasLoaded){
+       if(isInUse == !isInUse && Recorder.isRecordingPlaying){
     	   left.set(leftMotorPower);
     	   right.set(rightMotorPower);
        }

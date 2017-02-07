@@ -17,7 +17,7 @@ public class Shifter implements Component{
 	public void update(){
 		one = Robot.stick.getRawButton(XboxMap.B);
 		
-		if(one == true && past == false && Recorder.hasLoaded){
+		if(one == true && past == false && Recorder.isRecordingPlaying){
 			solenoid.set(!solenoid.get());
 		}
 		

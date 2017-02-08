@@ -49,12 +49,7 @@ public class GearHolder implements Component {
 		
 		
 		
-		liftSpeed = ManipulatorStick.getRawAxis(XboxMap.RIGHT_JOY_HORIZ);
-		if(Recorder.isRecordingPlaying){
-			if (liftSpeed < DEADZONE_1|| liftSpeed > DEADZONE_2){
-				manipulatorMotor.set(liftSpeed);
-			}
-			
+		if(!Recorder.isRecordingPlaying){		
 			
 			//Prevents the robot from changing where it is moving to if it is currently moving.
 			if(!isTraveling)
@@ -67,11 +62,13 @@ public class GearHolder implements Component {
 					{
 						manipulatorMotor.set(-0.11);
 						isTraveling = true;
+						currentLocation = MIDDLE;
 					}
 					if(bottomLimit)
 					{
 						manipulatorMotor.set(0.11);
 						isTraveling = true;
+						currentLocation = MIDDLE;
 					}
 					
 				}
@@ -81,41 +78,57 @@ public class GearHolder implements Component {
 			
 					manipulatorMotor.set(0.11);
 					isTraveling = true;
+					currentLocation = TOP;
 				}
 				//If you press the A button, sets the motor to go down, towards bottomLimit, as well as setting isTraveling to true, so the robot can't change direction mid-movement.
 				if(Robot.stick.getRawButton(XboxMap.A))
 				{
 					manipulatorMotor.set(-0.11);
 					isTraveling = true;
+					currentLocation = BOTTOM;
 				}
 			}
 		}
-	
-		if(topLimit)
+		if(isTraveling)
 		{
-			currentLocation = TOP;
-		}
-		if(bottomLimit)
-		{
-			currentLocation = BOTTOM;
-			if(isTraveling)
+			if(topLimit && currentLocation == TOP)
 			{
 				
 				manipulatorMotor.set(0);
 				isTraveling = false;
+					
+			}
+			if(bottomLimit && currentLocation == BOTTOM)
+			{
+				manipulatorMotor.set(0);
+				isTraveling = false;
+					
+			}
+			if(middleLimit && currentLocation == MIDDLE)
+			{
+				manipulatorMotor.set(0);
+				isTraveling = false;
+			}
+		}
+		
+		//Use right joystick to do the thingy do
+		
+		double speed = Robot.stick.getRawAxis(XboxMap.RIGHT_JOY_VERT);
+		if(Robot.stick.getRawButton(XboxMap.R_ANALOG))
+		{
+			if(speed <= DEADZONE_1 || speed >= DEADZONE_2)
+			{
+				manipulatorMotor.set(0);
+			} 
+			else
+			{
+				manipulatorMotor.set(speed);
 				
 			}
 		}
-		if(middleLimit)
-		{
-			currentLocation = MIDDLE;
-		}
-		
-		
-	
 }//robot.stick.getButton(xboxmap.X)
 	public void autoUpdate(){
-	//We wanted to add a rumble, but were too lazy.
+	//We wanted to add a rumble, but were too lazy. Also too lazy to add the ' in were
 	}
 	@Override
 	public void disable() {

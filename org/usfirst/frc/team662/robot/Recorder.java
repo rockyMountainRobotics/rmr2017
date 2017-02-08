@@ -139,7 +139,7 @@ public class Recorder implements Component{
 			//This will run as soon as the player changes the ui back to false to stop recording
 		} else if (hasFinished) {
 			GlobalTime.stop();
-			GlobalTime.reset();
+			GlobalTime.reset(); 
 			lastTime = -1;
 			saveRecording();
 			//Reset hasFinished

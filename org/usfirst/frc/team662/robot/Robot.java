@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 /**
  * This is a demo program showing the use of the RobotDrive class. The
@@ -34,7 +35,8 @@ public class Robot extends SampleRobot {
 	
 	
 	public static Joystick stick;
-	Compressor compress = new Compressor(0);
+	final static int DIGITAL_INPUT_PORT = 0;
+	DigitalInput input = new DigitalInput(DIGITAL_INPUT_PORT);
 	ArrayList<Component> components;
 	ArrayList<Component> disabled;
 	
@@ -44,7 +46,7 @@ public class Robot extends SampleRobot {
 		components = new ArrayList<Component>();
 		//components.add(new GearHolder());
 		components.add(new Drive());
-		//components.add(new Recorder());
+		components.add(new Recorder());
 		
 		//disable items
 		disabled = new ArrayList<Component>();
@@ -75,7 +77,7 @@ public class Robot extends SampleRobot {
 	
 	//Air on 0 1 is auto
 	public void autonomous() {
-		while (isEnabled() && isAutonomous()) {
+		while (isEnabled() && isAutonomous() && input.get()) {
 			for (int i = components.size() - 1; i >= 0; i--) {
 				components.get(i).autoUpdate();
 				if(!SmartDashboard.getBoolean(components.get(i).getClass().getName(), true)){
@@ -91,7 +93,6 @@ public class Robot extends SampleRobot {
 			}
 		}
 	}
-
 	/**
 	 * Runs the motors with arcade steering.
 	 */

@@ -6,6 +6,8 @@ import com.ctre.CANTalon;
 public class DualTalon implements SpeedController {
 	
 	CANTalon left, right;
+	int leftPort;
+	int rightPort;
 	
 	double currentSpeed;
 	double leftSpeedMultiplier;
@@ -13,11 +15,16 @@ public class DualTalon implements SpeedController {
 	
 	public DualTalon(int leftChannel, int rightChannel) {
 		this(new CANTalon(leftChannel), new CANTalon(rightChannel));
+		leftChannel = leftPort;
+		rightChannel = rightPort;
 	}
 	
 	public DualTalon(CANTalon left, CANTalon right) {
 		this.left = left;
 		this.right = right;
+		
+		Recorder.addRecordable(() -> left.get(), (speed) -> left.set((double)speed), leftPort);
+		Recorder.addRecordable(() -> right.get(), (speed) -> right.set((double)speed), rightPort);
 		
 		currentSpeed = 0;
 		leftSpeedMultiplier = rightSpeedMultiplier = 1.0;
@@ -107,4 +114,5 @@ public class DualTalon implements SpeedController {
 		right.set(0);
 		
 	}
+
 }

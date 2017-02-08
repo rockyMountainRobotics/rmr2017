@@ -189,7 +189,7 @@ public class Recorder implements Component{
 	//Save the timings arraylist to a file
 	void saveRecording() {
 		//The file name according to the user
-		String fileName = SmartDashboard.getString("input", "dc");
+		String fileName = SmartDashboard.getString("file name", "dc");
 		//This would be bad if it happened so change it to a real string.
 		if (fileName.equals("")) {
 			fileName = "defaultAuto";

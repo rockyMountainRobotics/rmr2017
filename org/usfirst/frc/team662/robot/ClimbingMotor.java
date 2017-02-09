@@ -7,7 +7,8 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class ClimbingMotor implements Component {
 	final static int PORT_CLIMING_MOTOR = 1, PORT_CONTROLLER = 1; //Another 0
-	CANTalon motor = new CANTalon(PORT_CLIMING_MOTOR);
+	final static int Other_Motor = 2;
+	DualTalon motor = new DualTalon(PORT_CLIMING_MOTOR, Other_Motor);
 	Joystick Joystick1 = new Joystick(PORT_CONTROLLER);
 	final static double DeadZone=.2;
 	
@@ -18,11 +19,13 @@ public class ClimbingMotor implements Component {
 		num = Joystick1.getRawAxis(XboxMap.RIGHT_JOY_HORIZ);
 		
 		//Checking if joystick is in the endzone
-		if (num < DeadZone){
-			num = 0;	
-		}
-		else{
-			motor.set(num);
+		if (!Recorder.isRecordingPlaying){
+			if (num < DeadZone){
+				num = 0;	
+			}
+			else{
+				motor.set(num);
+			}
 		}
 		
 	}

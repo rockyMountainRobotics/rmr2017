@@ -10,10 +10,10 @@ public class Drive implements Component{
 	final static double RIGHT_MULTIPLIER = 0.7;
 	final static double LEFT_DEADZONE = 0.15;
 	final static double RIGHT_DEADZONE = 0.15;
-	final static int FRONT_LEFT_MOTOR = 5;
-	final static int REAR_LEFT_MOTOR = 3;
-	final static int FRONT_RIGHT_MOTOR = 6;
-	final static int REAR_RIGHT_MOTOR = 8;
+	final static int FRONT_RIGHT_MOTOR = 5;
+	final static int REAR_RIGHT_MOTOR = 3;
+	final static int FRONT_LEFT_MOTOR = 6;
+	final static int REAR_LEFT_MOTOR = 8;
 
 	public Drive(){
 		
@@ -24,7 +24,7 @@ public class Drive implements Component{
 		right.setMultiplier(RIGHT_MULTIPLIER);
 		
 		//driver = new RobotDrive(left,right);
-		
+				
 	}
 	
 	public void autoUpdate(){

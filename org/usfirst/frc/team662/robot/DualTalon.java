@@ -14,12 +14,12 @@ public class DualTalon implements SpeedController {
 	double rightSpeedMultiplier;
 	
 	public DualTalon(int leftChannel, int rightChannel) {
-		this(new CANTalon(leftChannel), new CANTalon(rightChannel));
-		leftChannel = leftPort;
-		rightChannel = rightPort;
+		leftPort = leftChannel;
+		rightPort = rightChannel;
+		initDualTalon(new CANTalon(leftChannel), new CANTalon(rightChannel));
 	}
 	
-	public DualTalon(CANTalon left, CANTalon right) {
+	private void initDualTalon(CANTalon left, CANTalon right) {
 		this.left = left;
 		this.right = right;
 		

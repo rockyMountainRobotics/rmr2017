@@ -35,17 +35,25 @@ public class Robot extends SampleRobot {
 	
 	
 	public static Joystick stick;
-	final static int DIGITAL_INPUT_PORT = 0;
+	public static Joystick manipulatorStick;
+
+	final static int DIGITAL_INPUT_PORT = 1;
 	DigitalInput input = new DigitalInput(DIGITAL_INPUT_PORT);
 	ArrayList<Component> components;
 	ArrayList<Component> disabled;
 	
 	public Robot() {
 		stick = new Joystick(0);
+		manipulatorStick = new Joystick(1);
+
 
 		components = new ArrayList<Component>();
 		//components.add(new GearHolder());
 		components.add(new Drive());
+		components.add(new Shifter());
+		components.add(new CompressorSwitch());
+
+		//components.add(new GearHolder());
 		components.add(new Recorder());
 		
 		//disable items
@@ -96,7 +104,6 @@ public class Robot extends SampleRobot {
 	/**
 	 * Runs the motors with arcade steering.
 	 */
-	DigitalInput compressor = new DigitalInput(0);
 	public void operatorControl() {
 		while (isOperatorControl() && isEnabled()) {
 			for (int i = components.size() - 1; i >= 0; i--) {
@@ -121,5 +128,10 @@ public class Robot extends SampleRobot {
 	 * Runs during test mode
 	 */
 	public void test() {
+	}
+	
+	@Override
+	public void disabled(){
+		components.forEach((x) -> x.disable());
 	}
 }

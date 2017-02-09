@@ -114,7 +114,7 @@ public class Recorder implements Component{
 			//Also, put play related things on the ui
 			SmartDashboard.putData(ALL_FILES, autoChooser);
 			SmartDashboard.putBoolean("play recording", false);
-			System.out.println("LOADED THE THING");
+			System.out.println("LOADED THE Recording");
 		}
 		//Sort the pieces and timers arraylists based on ports. This is why recorder has to run last. 
 		//This is used when loading a recording.
@@ -189,7 +189,7 @@ public class Recorder implements Component{
 	//Save the timings arraylist to a file
 	void saveRecording() {
 		//The file name according to the user
-		String fileName = SmartDashboard.getString("input", "dc");
+		String fileName = SmartDashboard.getString("file name", "dc");
 		//This would be bad if it happened so change it to a real string.
 		if (fileName.equals("")) {
 			fileName = "defaultAuto";

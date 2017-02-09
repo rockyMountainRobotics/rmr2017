@@ -16,7 +16,7 @@ public class ClimbingMotor implements Component {
 	{
 		//Declaring the num double and setting it to hold the right joystick horizontal value
 		double num;
-		num = Joystick1.getRawAxis(XboxMap.RIGHT_JOY_HORIZ);
+		num = Joystick1.getRawAxis(XboxMap.LEFT_JOY_HORIZ);
 		
 		//Checking if joystick is in the endzone
 		if (!Recorder.isRecordingPlaying){

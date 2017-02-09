@@ -10,12 +10,9 @@ public class CompressorSwitch implements Component{
 	
 	public void update(){
 		if(input.get()){
-			System.out.println("Just called this code");
 			compressor.start();
 		}
 		else{
-			System.out.println("Calld Stop");
-
 			compressor.stop();
 		}
 	}

@@ -35,6 +35,8 @@ public class Robot extends SampleRobot {
 	
 	
 	public static Joystick stick;
+	public static Joystick manipulatorStick;
+
 	final static int DIGITAL_INPUT_PORT = 1;
 	DigitalInput input = new DigitalInput(DIGITAL_INPUT_PORT);
 	ArrayList<Component> components;
@@ -42,6 +44,8 @@ public class Robot extends SampleRobot {
 	
 	public Robot() {
 		stick = new Joystick(0);
+		manipulatorStick = new Joystick(1);
+
 
 		components = new ArrayList<Component>();
 		//components.add(new GearHolder());
@@ -124,5 +128,10 @@ public class Robot extends SampleRobot {
 	 * Runs during test mode
 	 */
 	public void test() {
+	}
+	
+	@Override
+	public void disabled(){
+		components.forEach((x) -> x.disable());
 	}
 }

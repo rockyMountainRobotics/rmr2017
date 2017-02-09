@@ -12,7 +12,7 @@ public class LawrensVisionWithComments {
 	//Variables correspond to the triangle screenshot titled VisionTriangle.png in ThisPC >> Pictures >> ScreenShot.
 	
 	public enum State {
-		INIT, MOVE_FORWARD, TURN, STOP, END, TURN_ON_PEG
+		INIT, MOVE_FORWARD, TURN, STOP, END, TURN_ON_PEG, FINISH, DO_NOTHING
 	}
 	State state = State.INIT;
 	
@@ -92,35 +92,41 @@ public class LawrensVisionWithComments {
 			distanceToTurn = ((Math.PI - Math.acos((Math.pow(robotToPeg, 2) - Math.pow(robotToEndOfPeg, 2) - 12)/(-2*robotToEndOfPeg)))/FOV)*imageHeight;
 					
 			if(state == State.INIT){
+				//during initialize state - set the left and right values originally, then start the next state
 				state = State.TURN;
 				startPositionLeft = left.x;
 				startPositionRight = right.x;
 			}
 			if(state == State.TURN){
-				
+				//Turn state
 				
 				if(robToLeftTape > robToRightTape){
+					//Turn right because we are on the right side of the tape
 					frontLeftMotor.set(TURN_SPEED);
-					frontRightMotor.set(-TURN_SPEED);
 					rearLeftMotor.set(TURN_SPEED);
+					frontRightMotor.set(-TURN_SPEED);
 					rearRightMotor.set(-TURN_SPEED);
 					
 					if(Math.abs(left.x - startPositionLeft) >= distanceToTurn){
+						//If we've turned far enough, move to the next state
 						state = State.STOP;
 					}
 				}
 				else{
+					//Turn left because we are on the left side of the tape
 					frontLeftMotor.set(-TURN_SPEED);
-					frontRightMotor.set(TURN_SPEED);
 					rearLeftMotor.set(-TURN_SPEED);
+					frontRightMotor.set(TURN_SPEED);
 					rearRightMotor.set(TURN_SPEED);
 					
 					if(Math.abs(right.x - startPositionRight) == distanceToTurn){
+						//If we've turned far enough, move to the next state
 						state = State.STOP;
 					}
 				}
 			}
 			if(state == State.STOP){
+				//During the stop state, stop all motors and then move to the next state
 				frontLeftMotor.set(0);
 				frontRightMotor.set(0);
 				rearLeftMotor.set(0);
@@ -132,11 +138,13 @@ public class LawrensVisionWithComments {
 			
 			
 			if(state == State.MOVE_FORWARD){
+				//Move forward state moves the robot forward
 				frontLeftMotor.set(STRAIGHT_SPEED);
 				frontRightMotor.set(STRAIGHT_SPEED);
 				rearLeftMotor.set(STRAIGHT_SPEED);
 				rearRightMotor.set(STRAIGHT_SPEED);
 				if(left.y >= TARGET_SIZE || right.y >= TARGET_SIZE){
+					//If the robot is close enough to the peg on either side, move on to the next state
 					state = State.TURN_ON_PEG;
 				}
 			}
@@ -144,193 +152,32 @@ public class LawrensVisionWithComments {
 			
 			
 			if(state == State.TURN_ON_PEG){
-				if(left.y >= TARGET_SIZE){
-					frontLeftMotor.set(-TURN_SPEED);
-					frontRightMotor.set(TURN_SPEED);
-					rearLeftMotor.set(-TURN_SPEED);
-					rearRightMotor.set(TURN_SPEED);
-				}else{
+				if(left.y <= TARGET_SIZE){
+					//If the left tape is too small, turn right to face the peg head on
 					frontLeftMotor.set(TURN_SPEED);
 					frontRightMotor.set(-TURN_SPEED);
 					rearLeftMotor.set(TURN_SPEED);
 					rearRightMotor.set(-TURN_SPEED);
 				}
-			}
-			//turning to face point a
-			/*if(distanceToTurn != 0 && state == State.INIT)
-				state = State.TURN;
-			if(state == State.TURN){
-				right1 = right.x;
-				left1 = left.x;
-				
-				
-				if(robToLeftTape < robToRightTape){
-					//robot is on the left side
-					frontLeftMotor.set(0.5);
-					rearLeftMotor.set(0.5);
-					frontRightMotor.set(-0.5);
-					rearRightMotor.set(-0.5);
-					right2 = right.x;
-					left2 = left.x;
+				else if(right.y <= TARGET_SIZE){
+					//If the right tape is too small, turn left to face the peg head on
+					frontLeftMotor.set(-TURN_SPEED);
+					frontRightMotor.set(TURN_SPEED);
+					rearLeftMotor.set(-TURN_SPEED);
+					rearRightMotor.set(TURN_SPEED);
 				}
-				
-				if(robToLeftTape > robToRightTape){
-					//robot is on the right side
-					frontLeftMotor.set(-0.5);
-					rearLeftMotor.set(-0.5);
-					frontRightMotor.set(0.5);
-					rearRightMotor.set(0.5);
-					right2 = right.x;
-					left2 = left.x;
+				if (right.y >= TARGET_SIZE && left.y >= TARGET_SIZE){
+					state = State.FINISH;
 				}
 			}
-			if(Math.abs(right2-right1) >= distanceToTurn && state == State.TURN){
-				state = State.STOP;
-			}*/
-			
-			
-			
-			
-			
-			/////////BLOCK OF CODE IS BEING RENOVATED ;) BAD!!!! @@@@@ at all of the things
-			/*if (distanceToTurn != Math.abs(right.x-left.x) && state == State.INIT){
-				state = State.TURN;
+			if (state == State.FINISH){
+				Recorder.initializePlay(Recorder.allFound.get(VISION_FILE_NAME));
+				SmartDashboard.putBoolean("playing", true);
+				Drive.isInUse = false;
+				state = State.DO_NOTHING;
 			}
 			
 			
-			if(state == State.TURN){
-				//Checking which side of the peg the robot is on
-				Drive.isInUse = true;
-				if (robToLeftTape < robToRightTape){
-					//Robot is on the left side of the peg
-					
-					//Turn right
-					frontLeftMotor.set(0.5);
-					rearLeftMotor.set(0.5);
-					frontRightMotor.set(-0.5);
-					rearRightMotor.set(-0.5);
-				
-				
-				
-				}
-				if (robToLeftTape>robToRightTape){
-					
-					//Robot is on the right side of the peg; turn left
-					frontLeftMotor.set(-0.5);
-					rearLeftMotor.set(-0.5);
-					frontRightMotor.set(0.5);
-					rearRightMotor.set(0.5);
-				
-				
-				}
-			}
-			
-			
-			if(distanceToTurn == Math.abs(right.x-left.x) && state == State.TURN){
-				state = State.STOP;
-				
-			}*/
-			
-			//Stop the robot
-			/*if(state == State.STOP){
-				frontLeftMotor.set(0);
-				rearLeftMotor.set(0);
-				frontRightMotor.set(0);
-				rearRightMotor.set(0);
-	
-				
-			}	
-			
-			if((right.height< TARGET_SIZE && left.height < TARGET_SIZE) && state == State.STOP)
-			{
-				state = State.MOVE_FORWARD;
-			}
-			
-			if(state == State.MOVE_FORWARD)
-			{
-				if(right.height < TARGET_SIZE && robToLeftTape > robToRightTape)
-				{
-					frontLeftMotor.set(0.5);
-					rearLeftMotor.set(0.5);
-					frontRightMotor.set(0.5);
-					rearLeftMotor.set(0.5);
-				}
-				if(left.height < TARGET_SIZE)
-				{
-					frontLeftMotor.set(0.5);
-					rearLeftMotor.set(0.5);
-					frontRightMotor.set(0.5);
-					rearLeftMotor.set(0.5);
-				}
-			}
-			
-			if((right.height >= TARGET_SIZE || left.height >= TARGET_SIZE))
-			
-			///////////CODE IS BEING RENOVATED- PROCEED WITH CAUTION
-			if(robToLeftTape < robToRightTape){
-				//Robot is on the right side of the peg
-				if (right.height < 147.06 && state == State.STOP){
-					state = State.MOVE_FORWARD;
-					isFinished = false;
-				}
-				if (state == State.MOVE_FORWARD){
-					//The rectangle is smaller than we want, so move closer so it gets bigger
-					frontLeftMotor.set(0.5);
-					rearLeftMotor.set(0.5);
-					frontRightMotor.set(0.5);
-					rearRightMotor.set(0.5);
-					
-				}
-				
-				if(right.height != left.height && state == State.MOVE_FORWARD){
-					state = State.TURN;
-					
-				}
-				
-				
-				if(state == State.TURN){
-					//turn to the right to face the peg
-					frontLeftMotor.set(0.5);
-					rearLeftMotor.set(0.5);
-					frontRightMotor.set(-0.5);
-					rearRightMotor.set(-0.5);
-					
-				}
-			}
-			
-			
-			
-			
-			if(robToLeftTape > robToRightTape){
-				//Robot is on the left side of the peg
-				if(left.height < 147.06 && state == State.STOP){
-					state = State.MOVE_FORWARD;
-				}
-					if (state == State.MOVE_FORWARD){
-						//The rectangle is smaller than we want, so move the robot closer
-						frontLeftMotor.set(0.5);
-						rearLeftMotor.set(0.5);
-						frontRightMotor.set(0.5);
-						rearRightMotor.set(0.5);
-				}
-				if(right.height != left.height && state == State.MOVE_FORWARD){
-					state = State.TURN;
-				}
-				
-				
-					if (state == State.TURN){
-						//turn to the left to face the peg
-						frontLeftMotor.set(-0.5);
-						rearLeftMotor.set(-0.5);
-						frontRightMotor.set(0.5);
-						rearRightMotor.set(0.5);
-				}
-				
-			}*/
-			//Connect it to the recorder
-			Recorder.initializePlay(Recorder.allFound.get(VISION_FILE_NAME));
-			SmartDashboard.putBoolean("playing", true);
-			Drive.isInUse = false;
 		}
 		
 	});

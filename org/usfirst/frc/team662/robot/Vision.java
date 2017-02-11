@@ -59,7 +59,6 @@ public class Vision implements Component
 			Rect left = null;
 			Rect right = null;
 			
-			//Please comment what you guys did here 
 			if (pipeline.filterContoursOutput().size() >= 2){
 				for(int i = 0 ; i < pipeline.filterContoursOutput().size(); i++)
 				{

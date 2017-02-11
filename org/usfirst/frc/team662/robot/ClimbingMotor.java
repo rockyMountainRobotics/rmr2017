@@ -9,7 +9,7 @@ public class ClimbingMotor implements Component {
 	final static int PORT_CLIMING_MOTOR = 1;
 	final static int PORT_CONTROLLER = 1;
 	final static int OTHER_MOTOR = 0;
-	final static double MULTIPLIER = .2;
+	final static double MULTIPLIER = .4;
 	DualTalon motor = new DualTalon(PORT_CLIMING_MOTOR, OTHER_MOTOR);
 	final static double DeadZone=.2;
 	

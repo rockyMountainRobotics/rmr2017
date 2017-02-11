@@ -14,7 +14,7 @@ public class GearHolder implements Component {
 	final static int JOYmanipulatorStick_PORT_1 = 0;
 	final static int MANIPULATOR_MOTOR_PORT_2 = 7;
 	
-	final static double SPEED = .2;
+	final static double SPEED = .5;
 	
 	final static double DEADZONE_1 = -.5;
 	final static double DEADZONE_2 = .5;

@@ -24,124 +24,134 @@ public class GearHolder implements Component {
 	public DigitalInput limitSwitchBottom = new DigitalInput(LIMIT_SWITCH_CHANNEL_BOTTOM);
 	public DigitalInput limitSwitchMiddle = new DigitalInput(LIMIT_SWITCH_CHANNEL_MIDDLE);
 
-	double liftSpeed = 0;
 	double currentLocation = BOTTOM;
 	
 	boolean isTraveling = false;
+	boolean isManualOverride = false;
+	
+	double speed = 0;
 	
 	public GearHolder(){
 		
-		Recorder.addRecordable(() -> manipulatorMotor.get(), (speed) -> check((double)speed), MANIPULATOR_MOTOR_PORT_2);
+		Recorder.addRecordable(() -> manipulatorMotor.get(), (speed) -> moveMotor((double)speed), MANIPULATOR_MOTOR_PORT_2);
 		
 	}
 	
 	public void update(){
-		boolean topLimit= true;
-		topLimit = !limitSwitchTop.get();
+		boolean topLimit = !limitSwitchTop.get();
 		
-		boolean bottomLimit = true;
-		bottomLimit = !limitSwitchBottom.get();
+		boolean bottomLimit = !limitSwitchBottom.get();
 		
-		boolean middleLimit = true;
-		middleLimit = !limitSwitchMiddle.get();
+		boolean middleLimit = !limitSwitchMiddle.get();
 		
 		
-		//System.out.println(topLimit + " " + bottomLimit + " " + middleLimit);
-
 		
 		if(!Recorder.isRecordingPlaying){		
 			
-			//Prevents the robot from changing where it is moving to if it is currently moving.
-			if(!isTraveling)
+			
+			//If you press the X button, it checks whether you were last at topLimit or bottomLimit, 
+			// and sets the motor to get you from the top/bottom to the middle.
+			if(Robot.manipulatorStick.getRawButton(XboxMap.X)  && !isTraveling)
 			{
-				//If you press the X button, it checks whether you were last at topLimit or bottomLimit, and sets the motor to get you from the top/bottom to the middle.
-				if(Robot.manipulatorStick.getRawButton(XboxMap.X))
+				
+				if(currentLocation == TOP)
 				{
-					
-					if(currentLocation == TOP)
-					{
-						manipulatorMotor.set(-0.1);
-						isTraveling = true;
-						currentLocation = MIDDLE;
-					}
-					if(currentLocation == BOTTOM)
-					{
-						manipulatorMotor.set(0.1);
-						isTraveling = true;
-						currentLocation = MIDDLE;
-					}
-					
-				}
-				//If you press the Y button, sets the motor to go up, towards topLimit, as well as setting isTraveling to true, so the robot can't change direction mid-movement.
-				if(Robot.manipulatorStick.getRawButton(XboxMap.Y) && currentLocation != TOP)
-				{
-					manipulatorMotor.set(0.1);
+					speed = -.1;
 					isTraveling = true;
-					currentLocation = TOP;
+					currentLocation = MIDDLE;
 				}
-				//If you press the A button, sets the motor to go down, towards bottomLimit, as well as setting isTraveling to true, so the robot can't change direction mid-movement.
-				if(Robot.manipulatorStick.getRawButton(XboxMap.A) && currentLocation != BOTTOM)
+				if(currentLocation == BOTTOM)
 				{
-					manipulatorMotor.set(-0.1);
+					speed = .1;
 					isTraveling = true;
-					currentLocation = BOTTOM;
+					currentLocation = MIDDLE;
 				}
+				
+			}
+			//If you press the Y button, sets the motor to go up, towards topLimit, as well as setting isTraveling to true,
+			// so the robot can't change direction mid-movement.
+			if(Robot.manipulatorStick.getRawButton(XboxMap.Y) && currentLocation != TOP && !isTraveling)
+			{
+				speed = .1;
+				isTraveling = true;
+				currentLocation = TOP;
+			}
+			//If you press the A button, sets the motor to go down, towards bottomLimit, as well as setting isTraveling to true,
+			//so the robot can't change direction mid-movement.
+			if(Robot.manipulatorStick.getRawButton(XboxMap.A) && currentLocation != BOTTOM && !isTraveling)
+			{
+				speed = -.1;
+				isTraveling = true;
+				currentLocation = BOTTOM;
 			}
 		}
 		if(isTraveling)
 		{
 			if(topLimit && currentLocation == TOP)
 			{
-				System.out.println("Hit the top");
-				manipulatorMotor.set(0);
+				speed = 0;
 				isTraveling = false;
 					
 			}
 			if(bottomLimit && currentLocation == BOTTOM)
 			{
-				manipulatorMotor.set(0);
+				speed = 0;
 				isTraveling = false;
 					
 			}
 			if(middleLimit && currentLocation == MIDDLE)
 			{
-				manipulatorMotor.set(0);
+				speed = 0;
 				isTraveling = false;
 			}
 		}
-		//Use right joymanipulatorStick to do the thingy do
 		
-		double speed = Robot.manipulatorStick.getRawAxis(XboxMap.RIGHT_JOY_VERT);
+		//Manual Override using the joystick.
 		if(Robot.manipulatorStick.getRawButton(XboxMap.R_ANALOG))
 		{
-			if(Math.abs(speed) <= DEADZONE_2 || topLimit || bottomLimit)
+			isManualOverride = true;
+			
+			speed = Robot.manipulatorStick.getRawAxis(XboxMap.RIGHT_JOY_VERT);
+
+			if(Math.abs(speed) <= DEADZONE_2)
 			{
-				manipulatorMotor.set(0);
+				speed = 0;
 			} 
 			else
 			{
-				manipulatorMotor.set(speed * .1);
-				
+				speed = speed * .1;
 			}
 		}
-}//robot.manipulatorStick.getButton(xboxmap.X)
+		else if (isManualOverride){
+			speed = 0;
+			isManualOverride = false;
+		}
+		
+		//This actually moves the motors now. Motor should only move if called from here.
+		moveMotor(speed);
+}
 	public void autoUpdate(){
-	//We wanted to add a rumble, but were too lazy. Also too lazy to add the ' in were
 	}
+	
 	@Override
 	public void disable() {
 		manipulatorMotor.set(0);
-		liftSpeed = 0;
+		speed = 0;
 		currentLocation = BOTTOM;
 		isTraveling = false;
 	}
-	public void check(double speed) {
+	
+	public void moveMotor(double speed) {
 		
-		if(!limitSwitchTop.get() && liftSpeed > 0){
+		if(!limitSwitchTop.get() && speed > 0){
 			speed = 0;
+			currentLocation = TOP;
+			System.out.println("Emergency stopped the motor for going too high");
 		}
-		if(!limitSwitchBottom.get() && liftSpeed < 0){
-			speed = 0;		
+		if(!limitSwitchBottom.get() && speed < 0){
+			speed = 0;
+			currentLocation = BOTTOM;
+			System.out.println("Emergency stopped the motor for going too low");
 		}
 		manipulatorMotor.set(speed);
 	}

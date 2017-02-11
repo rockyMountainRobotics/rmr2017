@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.Joystick;
 public class Shifter implements Component{
 	public static final int SOLENOID_PORT = 0;
 	Solenoid solenoid = new Solenoid(SOLENOID_PORT);
-	boolean one = true;
+	boolean current = true;
 	boolean past = false;
 	
 	public Shifter(){
@@ -15,13 +15,13 @@ public class Shifter implements Component{
 	}
 	
 	public void update(){
-		one = Robot.stick.getRawButton(XboxMap.B);
+		current = Robot.stick.getRawButton(XboxMap.B);
 		
-		if(one == true && past == false && !Recorder.isRecordingPlaying){
+		if(current == true && past == false && !Recorder.isRecordingPlaying){
 			solenoid.set(!solenoid.get());
 		}
 		
-		past = one;
+		past = current;
 	}
 
 	@Override

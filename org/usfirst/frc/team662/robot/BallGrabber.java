@@ -3,7 +3,6 @@ import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedController;
 
-@SuppressWarnings("unused")
 public class BallGrabber implements Component{
 
 	final static int MANIPULATOR_MOTOR_PORT = 0;

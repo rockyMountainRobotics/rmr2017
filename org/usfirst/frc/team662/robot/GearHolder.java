@@ -14,6 +14,8 @@ public class GearHolder implements Component {
 	final static int JOYmanipulatorStick_PORT_1 = 0;
 	final static int MANIPULATOR_MOTOR_PORT_2 = 7;
 	
+	final static double SPEED = .2;
+	
 	final static double DEADZONE_1 = -.5;
 	final static double DEADZONE_2 = .5;
 	
@@ -56,13 +58,13 @@ public class GearHolder implements Component {
 				
 				if(currentLocation == TOP)
 				{
-					speed = -.1;
+					speed = -SPEED;
 					isTraveling = true;
 					currentLocation = MIDDLE;
 				}
 				if(currentLocation == BOTTOM)
 				{
-					speed = .1;
+					speed = SPEED;
 					isTraveling = true;
 					currentLocation = MIDDLE;
 				}
@@ -72,7 +74,7 @@ public class GearHolder implements Component {
 			// so the robot can't change direction mid-movement.
 			if(Robot.manipulatorStick.getRawButton(XboxMap.Y) && currentLocation != TOP && !isTraveling)
 			{
-				speed = .1;
+				speed = SPEED;
 				isTraveling = true;
 				currentLocation = TOP;
 			}
@@ -80,7 +82,7 @@ public class GearHolder implements Component {
 			//so the robot can't change direction mid-movement.
 			if(Robot.manipulatorStick.getRawButton(XboxMap.A) && currentLocation != BOTTOM && !isTraveling)
 			{
-				speed = -.1;
+				speed = -SPEED;
 				isTraveling = true;
 				currentLocation = BOTTOM;
 			}
@@ -111,7 +113,7 @@ public class GearHolder implements Component {
 		{
 			isManualOverride = true;
 			
-			speed = Robot.manipulatorStick.getRawAxis(XboxMap.RIGHT_JOY_VERT);
+			speed = -Robot.manipulatorStick.getRawAxis(XboxMap.RIGHT_JOY_VERT);
 
 			if(Math.abs(speed) <= DEADZONE_2)
 			{
@@ -119,7 +121,7 @@ public class GearHolder implements Component {
 			} 
 			else
 			{
-				speed = speed * .1;
+				speed = speed * SPEED;
 			}
 		}
 		else if (isManualOverride){

@@ -8,7 +8,8 @@ import edu.wpi.first.wpilibj.Joystick;
 public class ClimbingMotor implements Component {
 	final static int PORT_CLIMING_MOTOR = 1;
 	final static int PORT_CONTROLLER = 1;
-	final static int OTHER_MOTOR = 2;
+	final static int OTHER_MOTOR = 0;
+	final static double MULTIPLIER = .2;
 	DualTalon motor = new DualTalon(PORT_CLIMING_MOTOR, OTHER_MOTOR);
 	final static double DeadZone=.2;
 	
@@ -17,14 +18,14 @@ public class ClimbingMotor implements Component {
 		
 		//Declaring the num double and setting it to hold the right joystick horizontal value
 		double speed;
-		speed = Robot.manipulatorStick.getRawAxis(XboxMap.LEFT_JOY_HORIZ);
+		speed = -Robot.manipulatorStick.getRawAxis(XboxMap.LEFT_TRIGGER);
 		
 		//Checking if joystick is in the endzone
 		if (!Recorder.isRecordingPlaying){
 			if (Math.abs(speed) < DeadZone){
 				speed = 0;	
 			}
-			motor.set(speed);
+			motor.set(speed * MULTIPLIER);
 		}
 		
 	}

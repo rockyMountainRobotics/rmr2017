@@ -272,7 +272,7 @@ public class Recorder implements Component{
 			
 			
 		} else {
-			System.err.println("The number of pieces on the robot does not match that of the recording.");
+			System.err.println("The number of pieces on the robot does not match that of the recording." + pieces.size() +" " + timers.size());
 			SmartDashboard.putBoolean("play recording", false);
 			isRecordingPlaying = false;
 		}

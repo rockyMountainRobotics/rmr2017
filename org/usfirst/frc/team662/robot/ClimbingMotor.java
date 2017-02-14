@@ -18,7 +18,6 @@ public class ClimbingMotor implements Component {
 		
 		//Declaring the num double and setting it to hold the right joystick horizontal value
 		double speed;
-		//changed from negative because manipulator told us we need to turn it the other way
 		speed = -Robot.manipulatorStick.getRawAxis(XboxMap.LEFT_TRIGGER);
 		
 		//Checking if joystick is in the endzone

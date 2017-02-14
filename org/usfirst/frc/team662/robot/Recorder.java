@@ -7,11 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.nio.file.DirectoryNotEmptyException;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -26,22 +22,39 @@ public class Recorder implements Component{
 	//Timers used for recording and playing
 	Timer GlobalTime = new Timer();
 	static Timer playingTimer = new Timer();
+	
 	//The ui radio buttons. Also stores files with name.
 	SendableChooser<File> autoChooser = new SendableChooser<File>();
-	SendableChooser<File> deleteChooser = new SendableChooser<File>();
 	
 	public static Map<String, File> allFound;
 
 	//Some constants
 	static final String ALL_FILES = "autoFiles";
 	static final String DIRECTORY = "/home/lvuser/Records/";
-	
+	static final String FILE_NAME = "File name";
+	static final String DO_RECORD = "Create recording";
+	static final String DO_DELETE = "Delete rcording";
+	static final String DO_PLAY = "Play recording";
+	static final String DO_REFRESH = "Refresh the available files";
+	static final String DEFAULT_NAME = "defaultAuto";
+			
 	//Used for the recorder
 	double lastTime = -1;
 	boolean hasFinished = false;
+	
 	//Used for the player
 	public static boolean isRecordingPlaying = false;
 
+	//These are the arrays used to store recording information
+	
+	//This one is used to store the functions to the hardware
+	static ArrayList<Hardware> pieces = new ArrayList<Hardware>();
+	
+	//This one stores when the values change and what they change to
+	static ArrayList<Timings> timers= new ArrayList<Timings>();
+	
+	//This one is for erasing the timers array, when required
+	static ArrayList<Timings> defaultTimers= new ArrayList<Timings>();
 
 	static class Hardware {
 		//A supplier takes no arguments and returns something. It saves a method as a variable.
@@ -77,49 +90,17 @@ public class Recorder implements Component{
 		}
 	}
 
-	//These are the arrays used to store recording information
-	//This one is used to store the functions to the hardware
-	static ArrayList<Hardware> pieces = new ArrayList<Hardware>();
-	//This one stores when the values change and what they change to
-	static ArrayList<Timings> timers= new ArrayList<Timings>();
-
 	//must be last to be constructed in the main robot code
 	public Recorder() {
 		//Put the ui elements
-		SmartDashboard.putBoolean("record", false);
-		SmartDashboard.putBoolean("delete", false);
-		SmartDashboard.putString("name of file", "defaultAuto");
+		SmartDashboard.putBoolean(DO_RECORD, false);
+		SmartDashboard.putBoolean(DO_DELETE, false);
+		SmartDashboard.putBoolean(DO_REFRESH, false);
 
-		//Make sure our folders really exist
-		File records = new File(DIRECTORY);
-		records.mkdirs();
+		SmartDashboard.putString(FILE_NAME, DEFAULT_NAME);
+
+		refreshFiles();
 		
-		//Get all files in the directory
-		File[] foundRecords = records.listFiles();
-		allFound = new HashMap<String, File>();
-		
-		//Did we find anything?
-		if (foundRecords != null && foundRecords.length != 0) {
-			//Add them as options if we did!
-			for (int i = 0; i < foundRecords.length; i++) {
-				if(i == 0){
-					autoChooser.addDefault(foundRecords[i].getName(), foundRecords[i]);
-				}
-				else{
-					autoChooser.addObject(foundRecords[i].getName(), foundRecords[i]);
-				}
-				allFound.put(foundRecords[i].getName(), foundRecords[i]);
-				deleteChooser.addObject(foundRecords[i].getName(), foundRecords[i]);
-			}
-			//Also, put play related things on the ui
-			SmartDashboard.putData(ALL_FILES, autoChooser);
-			SmartDashboard.putBoolean("play recording", false);
-			System.out.println("LOADED THE Recording");
-		}
-		//Sort the pieces and timers arraylists based on ports. This is why recorder has to run last. 
-		//This is used when loading a recording.
-		pieces.sort((a, b) -> a.port - b.port);
-		timers.sort((a, b) -> a.port - b.port);
 	}
 
 	//Called by each component at least once if it has hardware to record
@@ -129,12 +110,20 @@ public class Recorder implements Component{
 		//Port is incredibly important and is used to identify a hardware component with its saved recording
 		pieces.add(new Hardware(newGet, newSet, port));
 		timers.add(new Timings(port));
+		defaultTimers.add(new Timings(port));
 		System.out.println(port);
 	}
 
 	public void update() {
+		
+		//reload file choices, if needed
+		if(SmartDashboard.getBoolean(DO_REFRESH, false)){
+			refreshFiles();
+			SmartDashboard.putBoolean(DO_REFRESH, false);
+		}
+		
 		//Check if we need to record based on a dashboard
-		if (SmartDashboard.getBoolean("record", false)) {
+		if (SmartDashboard.getBoolean(DO_RECORD, false)) {
 			record();
 			//This will run as soon as the player changes the ui back to false to stop recording
 		} else if (hasFinished) {
@@ -149,7 +138,7 @@ public class Recorder implements Component{
 		
 
 		//play Recording
-		if (SmartDashboard.getBoolean("play recording", false)) {
+		if (SmartDashboard.getBoolean(DO_PLAY, false)) {
 			if(isRecordingPlaying){
 				play();
 			} else {
@@ -158,11 +147,12 @@ public class Recorder implements Component{
 		}
 		
 		//delete recording
-		if (SmartDashboard.getBoolean("delete recording", false)) {
+		if (SmartDashboard.getBoolean(DO_DELETE, false)) {
 			delete();
 		}
 		
 	}
+	
 	//Load whatever the saved file is
 	static ArrayList loadSavedRecording(File fileToLoad) {
 		//Create where we will save the loaded thing
@@ -175,10 +165,10 @@ public class Recorder implements Component{
 			deSerialized = (ArrayList<Timings>) in.readObject();
 		} catch (IOException i) {
 			System.err.println("There was a file retrieval error during the recording load sequence: " + i);
-			SmartDashboard.putBoolean("play recording", false);
+			SmartDashboard.putBoolean(DO_PLAY, false);
 		} catch (ClassNotFoundException c) {
 			System.err.println("There was a problem with the recording file: " + c);
-			SmartDashboard.putBoolean("play recording", false);
+			SmartDashboard.putBoolean(DO_PLAY, false);
 		}
 		//This sorts the array by port. Needed to ensure that the timings and hardwares line up even if the order they are added changes.
 		//The play method checks this more.
@@ -189,10 +179,10 @@ public class Recorder implements Component{
 	//Save the timings arraylist to a file
 	void saveRecording() {
 		//The file name according to the user
-		String fileName = SmartDashboard.getString("file name", "dc");
+		String fileName = SmartDashboard.getString(FILE_NAME, "dc");
 		//This would be bad if it happened so change it to a real string.
 		if (fileName.equals("")) {
-			fileName = "defaultAuto";
+			fileName = DEFAULT_NAME;
 		}
 		try {
 			//All of the io and file stuff. Create a file, then a stream, then an object stream
@@ -208,8 +198,8 @@ public class Recorder implements Component{
 			System.err.println("There was an error during the save recording sequence:" + i);
 		}
 	}
+	
 	//Records movements done based on component values.
-	@SuppressWarnings("unchecked")
 	public void record(){
 		//This adds a .1 second delay since components shouldn't change much quicker.
 		if (true /*GlobalTime.get() - lastTime > .01*/) {
@@ -217,6 +207,7 @@ public class Recorder implements Component{
 			//If this is the first time we are running the record code...
 			if (!hasFinished) {
 				GlobalTime.start();
+				timers = defaultTimers;
 			}
 			//Will remain true until the recording finishes
 			hasFinished = true;
@@ -249,7 +240,6 @@ public class Recorder implements Component{
 				
 	}
 
-	
 	public static void initializePlay(File fileToLoad){
 		
 		//Set our timers object equal to whatever gets loaded.
@@ -260,7 +250,7 @@ public class Recorder implements Component{
 			for (int i = 0; i < pieces.size(); i++) {
 				if (pieces.get(i).port != timers.get(i).port) {
 					System.err.println("The port of piece number " + i + " does not match that of the recording.");
-					SmartDashboard.putBoolean("play recording", false);
+					SmartDashboard.putBoolean(DO_PLAY, false);
 					isRecordingPlaying = false;
 					return;
 				}
@@ -279,6 +269,7 @@ public class Recorder implements Component{
 	
 
 	}
+	
 	//Called every time the robot updates and SmartDashboard button set. replays any action scheduled for the specific time
 	@SuppressWarnings("unchecked")
 	public void play() {
@@ -307,7 +298,7 @@ public class Recorder implements Component{
 		if (allDone){
 			//Reset everything back
 			isRecordingPlaying = false;
-			SmartDashboard.putBoolean("play recording", false);
+			SmartDashboard.putBoolean(DO_PLAY, false);
 		}
 
 			
@@ -315,14 +306,20 @@ public class Recorder implements Component{
 	
 	public void delete() {
 			//Delete the specified file
-			File deletionFile = deleteChooser.getSelected();
+			File deletionFile = autoChooser.getSelected();
 			deletionFile.delete();
 	}
 	
 	@Override
 	public void autoUpdate() {
+		//reload file choices, if needed
+		if(SmartDashboard.getBoolean(DO_REFRESH, false)){
+			refreshFiles();
+			SmartDashboard.putBoolean(DO_REFRESH, false);
+		}
+		
 		//play Recording
-		if (SmartDashboard.getBoolean("play recording", false)) {
+		if (SmartDashboard.getBoolean(DO_PLAY, false)) {
 			if(isRecordingPlaying){
 				play();
 			} else {
@@ -333,12 +330,47 @@ public class Recorder implements Component{
 
 	@Override
 	public void disable() {
-		SmartDashboard.putBoolean("play recording", false);
-		SmartDashboard.putBoolean("record", false);
+		SmartDashboard.putBoolean(DO_PLAY, false);
+		SmartDashboard.putBoolean(DO_RECORD, false);
 
 		isRecordingPlaying = false;
 		lastTime = -1;
 		hasFinished = false;
+	}
+	
+	public void refreshFiles(){
+		
+		//Make sure our folders really exist
+				File records = new File(DIRECTORY);
+				records.mkdirs();
+				
+				//Get all files in the directory
+				File[] foundRecords = records.listFiles();
+				allFound = new HashMap<String, File>();
+				
+				//Did we find anything?
+				if (foundRecords != null && foundRecords.length != 0) {
+					//Add them as options if we did!
+					for (int i = 0; i < foundRecords.length; i++) {
+						if(i == 0){
+							autoChooser.addDefault(foundRecords[i].getName(), foundRecords[i]);
+						}
+						else{
+							autoChooser.addObject(foundRecords[i].getName(), foundRecords[i]);
+						}
+						allFound.put(foundRecords[i].getName(), foundRecords[i]);
+					}
+					//Also, put play related things on the ui
+					SmartDashboard.putData(ALL_FILES, autoChooser);
+					SmartDashboard.putBoolean(DO_PLAY, false);
+					System.out.println("LOADED THE Recording");
+				}
+
+				//Sort the pieces and timers arraylists based on ports. This is why recorder has to run last. 
+				//This is used when loading a recording.
+				pieces.sort((a, b) -> a.port - b.port);
+				timers.sort((a, b) -> a.port - b.port);
+				
 	}
 	
 }

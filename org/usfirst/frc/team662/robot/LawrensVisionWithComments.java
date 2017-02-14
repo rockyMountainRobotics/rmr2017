@@ -12,7 +12,7 @@ public class LawrensVisionWithComments {
 	//Variables correspond to the triangle screenshot titled VisionTriangle.png in ThisPC >> Pictures >> ScreenShot.
 	
 	public enum State {
-		INIT, MOVE_FORWARD, TURN, STOP, END, TURN_ON_PEG, FINISH, DO_NOTHING
+		INIT, MOVE_FORWARD, TURN, STOP, END, TURN_ON_PEG, FINISH, DO_NOTHING, WAIT
 	}
 	State state = State.INIT;
 	
@@ -131,12 +131,12 @@ public class LawrensVisionWithComments {
 				frontRightMotor.set(0);
 				rearLeftMotor.set(0);
 				rearRightMotor.set(0);
-				if(left.y < TARGET_SIZE && right.y < TARGET_SIZE){
-					state = State.MOVE_FORWARD;
-				}
+				state = State.DO_NOTHING;
 			}
 			
 			
+			
+			//THIS STATE HAS ESSENTIALLY BEEN REMOVED (it never gets used)
 			if(state == State.MOVE_FORWARD){
 				//Move forward state moves the robot forward
 				frontLeftMotor.set(STRAIGHT_SPEED);

@@ -16,7 +16,7 @@ public class ClimbingMotor implements Component {
 	public void update()
 	{
 		
-		//Declaring the num double and setting it to hold the right joystick horizontal value
+		//Declaring the num double and setting it to hold the left trigger value
 		double speed;
 		speed = -Robot.manipulatorStick.getRawAxis(XboxMap.LEFT_TRIGGER);
 		

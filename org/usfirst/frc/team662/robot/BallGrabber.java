@@ -10,7 +10,7 @@ public class BallGrabber implements Component{
 	final static int MANIPULATOR_MOTOR_PORT = 0;
 	final static double GRAB_DEADZONE = 0.1;
 	CANTalon ballGrab = new CANTalon(1);
-	Solenoid ballPlace = new Solenoid(2);
+	//Solenoid ballPlace = new Solenoid(1);
 
 	
 	@Override
@@ -25,12 +25,12 @@ public class BallGrabber implements Component{
 		}
 		
 		//if the b button is held, open the ball holder. Otherwise, close it
-		if(Robot.stick.getRawButton(XboxMap.B)){
+		/*if(Robot.stick.getRawButton(XboxMap.B)){
 			ballPlace.set(true);
 		}
 		else{
 			ballPlace.set(false);
-		}
+		}*/
 	}
 	@Override
 	public void autoUpdate() {
@@ -39,6 +39,6 @@ public class BallGrabber implements Component{
 	@Override
 	public void disable() {
 		ballGrab.set(0);
-		ballPlace.set(false);
+		//ballPlace.set(false);
 	}
 }

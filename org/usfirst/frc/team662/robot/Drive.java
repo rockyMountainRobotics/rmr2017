@@ -14,11 +14,16 @@ public class Drive implements Component{
 	final static int REAR_RIGHT_MOTOR = 3;
 	final static int FRONT_LEFT_MOTOR = 6;
 	final static int REAR_LEFT_MOTOR = 8;
+	boolean reverseDrive;
+	boolean toggleHeld;
 
 	public Drive(){
 		
 		left = new DualTalon(FRONT_LEFT_MOTOR,REAR_LEFT_MOTOR);
 		right = new DualTalon(FRONT_RIGHT_MOTOR,REAR_RIGHT_MOTOR);
+		
+		reverseDrive = false;
+		toggleHeld = false;
 		
 		left.setMultiplier(LEFT_MULTIPLIER);
 		right.setMultiplier(RIGHT_MULTIPLIER);
@@ -32,7 +37,7 @@ public class Drive implements Component{
 	}
 	
 	public void update(){
-		//experimental drive train code by James S.
+		//drive train code by James S.
     	
            
        //set variables to defaults
@@ -47,6 +52,17 @@ public class Drive implements Component{
        }
        else {
     	   rightInput *= rightInput;
+       }
+       
+       //check if the reverse drive mode should be toggled
+       if(Robot.stick.getRawButton(XboxMap.A)){
+    	   if(!toggleHeld){
+    		   reverseDrive = !reverseDrive;
+    		   toggleHeld = true;
+    	   }
+       }
+       else{
+    	   toggleHeld = false;
        }
        
        
@@ -72,9 +88,15 @@ public class Drive implements Component{
        rightMotorPower = limitMotor(rightMotorPower, highInput);
        
        //set the motors to power variables
-       if(!isInUse && !Recorder.isRecordingPlaying){
+       if(!isInUse && !Recorder.isRecordingPlaying && !reverseDrive){
     	   left.set(leftMotorPower);
     	   right.set(rightMotorPower);
+       }
+       
+       //if reverse drive is enabled, set the motors to the negative value of the opposite side
+       if(!isInUse && !Recorder.isRecordingPlaying && reverseDrive){
+    	   left.set(-rightMotorPower);
+    	   right.set(-leftMotorPower);
        }
               
 	}

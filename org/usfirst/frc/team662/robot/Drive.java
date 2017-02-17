@@ -55,7 +55,7 @@ public class Drive implements Component{
        }
        
        //check if the reverse drive mode should be toggled
-       if(Robot.stick.getRawButton(XboxMap.A)){
+       if(Robot.stick.getRawButton(XboxMap.Y)){
     	   if(!toggleHeld){
     		   reverseDrive = !reverseDrive;
     		   toggleHeld = true;

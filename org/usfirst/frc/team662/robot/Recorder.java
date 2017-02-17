@@ -201,41 +201,37 @@ public class Recorder implements Component{
 	
 	//Records movements done based on component values.
 	public void record(){
-		//This adds a .1 second delay since components shouldn't change much quicker.
-		if (true /*GlobalTime.get() - lastTime > .01*/) {
-			lastTime = GlobalTime.get();
-			//If this is the first time we are running the record code...
-			if (!hasFinished) {
-				GlobalTime.start();
-				timers = defaultTimers;
+		lastTime = GlobalTime.get();
+		//If this is the first time we are running the record code...
+		if (!hasFinished) {
+			GlobalTime.start();
+			timers = defaultTimers;
+		}
+		//Will remain true until the recording finishes
+		hasFinished = true;
+		//Record every single hardware piece
+		for (int i = 0; i < pieces.size(); i++) {
+			//Store the actual object we are using from the ArrayList
+			Timings gottenTimer = timers.get(i);
+			Hardware gottenPiece = pieces.get(i);
+			
+			//Store the object for the previous timer value so we only have to save when it changes.
+			Object previousTimerValue = -1;
+			if (gottenTimer.values.size() != 0){
+				previousTimerValue = gottenTimer.values.get(gottenTimer.values.size() - 1);
 			}
-			//Will remain true until the recording finishes
-			hasFinished = true;
-			//Record every single hardware piece
-			for (int i = 0; i < pieces.size(); i++) {
-				//Store the actual object we are using from the ArrayList
-				Timings gottenTimer = timers.get(i);
-				Hardware gottenPiece = pieces.get(i);
-				
-				//Store the object for the previous timer value so we only have to save when it changes.
-				Object previousTimerValue = -1;
-				if (gottenTimer.values.size() != 0){
-					previousTimerValue = gottenTimer.values.get(gottenTimer.values.size() - 1);
-				}
-				//Store the current value for the motor
-				Object currentHardwareValue = gottenPiece.getter.get();
-				
-				
-				//Basically, we can't actually compare two plain objects because it will always be false. This casts it to whatever the subclass is
-				//There should be no time when the motor and its recordings should be of different type making this safe
-				/*System.out.println("Timer is: " + previousTimerValue.getClass().cast(previousTimerValue));
-				System.out.println("Motor is: " + currentMotorValue.getClass().cast(currentMotorValue));*/
-				if (gottenTimer.values.size() == 0 || !currentHardwareValue.getClass().cast(currentHardwareValue).equals(previousTimerValue.getClass().cast(previousTimerValue))) {
-					//Add the current time and the value to the array.
-					gottenTimer.times.add(GlobalTime.get());
-					gottenTimer.values.add(gottenPiece.getter.get());
-				}
+			//Store the current value for the motor
+			Object currentHardwareValue = gottenPiece.getter.get();
+			
+			
+			//Basically, we can't actually compare two plain objects because it will always be false. This casts it to whatever the subclass is
+			//There should be no time when the motor and its recordings should be of different type making this safe
+			if (gottenTimer.values.size() == 0 || !currentHardwareValue.getClass().cast(currentHardwareValue).equals(previousTimerValue.getClass().cast(previousTimerValue))) {
+				//Add the current time and the value to the array.
+				gottenTimer.times.add(GlobalTime.get());
+				gottenTimer.values.add(gottenPiece.getter.get());
 			}
+			
 		}
 				
 	}
@@ -271,9 +267,7 @@ public class Recorder implements Component{
 	}
 	
 	//Called every time the robot updates and SmartDashboard button set. replays any action scheduled for the specific time
-	@SuppressWarnings("unchecked")
 	public void play() {
-		//Checks if this is the first time we have run this code since clicking the button.
 		 
 		//If allDone is true at the end of the for loop, then everything is done.
 		boolean allDone = true;
@@ -339,7 +333,6 @@ public class Recorder implements Component{
 	}
 	
 	public void refreshFiles(){
-		defaultTimers.sort((a, b) -> a.port - b.port);
 		//Make sure our folders really exist
 				File records = new File(DIRECTORY);
 				records.mkdirs();
@@ -370,7 +363,7 @@ public class Recorder implements Component{
 				//This is used when loading a recording.
 				pieces.sort((a, b) -> a.port - b.port);
 				timers.sort((a, b) -> a.port - b.port);
-				
+				defaultTimers.sort((a, b) -> a.port - b.port);
 	}
 	
 }

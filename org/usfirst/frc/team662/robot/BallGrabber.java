@@ -10,6 +10,10 @@ public class BallGrabber implements Component{
 	final static int MANIPULATOR_MOTOR_PORT = 4;
 	final static int OPENER_PORT = 1;
 	final static double MULTIPLIER = -1;
+	final static int BALL_GRAB_SPEED = 1;
+	boolean isMoving = false;
+	boolean wereMoving = false;
+	
 
 
 	final static double GRAB_DEADZONE = 0.1;
@@ -20,12 +24,20 @@ public class BallGrabber implements Component{
 	@Override
 	public void update(){
 	
-		//set the ball collector speed to the value of the right trigger
-		if(Robot.manipulatorStick.getRawAxis(XboxMap.RIGHT_TRIGGER) > GRAB_DEADZONE){
-			ballGrab.set(Robot.manipulatorStick.getRawAxis(XboxMap.RIGHT_TRIGGER) * MULTIPLIER);
+		//If the collector is not moving and the left trigger is pressed, turn it on
+		if(Robot.manipulatorStick.getRawButton(XboxMap.LB) && !wereMoving){
+			if (isMoving){
+				ballGrab.set(0);
+			}
+			else{
+				ballGrab.set(BALL_GRAB_SPEED);
+			}
+			wereMoving = true;
+			isMoving = !isMoving;
 		}
-		else{
-			ballGrab.set(0);
+		else {
+			wereMoving = false;
+			isMoving = false;
 		}
 		
 		//if the b button is held, open the ball holder. Otherwise, close it

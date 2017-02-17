@@ -3,6 +3,7 @@ import com.ctre.CANTalon;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class GearHolder implements Component {
 	final static int LIMIT_SWITCH_CHANNEL_TOP = 2;
@@ -16,6 +17,8 @@ public class GearHolder implements Component {
 	
 
 	final static double SPEED = .5;
+	String state;
+	final static String KEY = "Holder state";
 	
 	final static double DEADZONE_1 = -.5;
 	final static double DEADZONE_2 = .5;
@@ -129,6 +132,32 @@ public class GearHolder implements Component {
 			speed = 0;
 			isManualOverride = false;
 		}
+		
+		//Sending what state the robot is in to the smart dash board
+		
+		//Checking state
+		if (currentLocation == TOP){
+			state = "Top";
+		}
+		else if (currentLocation == MIDDLE){
+			state = "Middle";
+		}
+		else if(currentLocation == BOTTOM){
+			state = "Bottom";
+		}
+		else if(currentLocation == BOTTOM && isTraveling == true){
+			state = "Traveling to bottom";
+		}
+		else if(currentLocation == MIDDLE && isTraveling == true){
+			state = "Traveling to middle";
+		}
+		else if(currentLocation == TOP && isTraveling == true){
+			state = "Traveling to top";
+		}
+		
+		//Sending to smart dash board
+		SmartDashboard.putString( KEY, state);
+		
 		
 		//This actually moves the motors now. Motor should only move if called from here.
 		moveMotor(speed);

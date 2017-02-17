@@ -13,6 +13,7 @@ public class ClimbingMotor implements Component {
 	DualTalon motor = new DualTalon(PORT_CLIMING_MOTOR, OTHER_MOTOR);
 	final static double DeadZone=.2;
 	
+	
 	public void update()
 	{
 		

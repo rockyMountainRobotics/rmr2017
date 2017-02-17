@@ -1,5 +1,6 @@
 package org.usfirst.frc.team662.robot;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Drive implements Component{
 	RobotDrive driver; 
@@ -16,6 +17,7 @@ public class Drive implements Component{
 	final static int REAR_LEFT_MOTOR = 8;
 	boolean reverseDrive;
 	boolean toggleHeld;
+	final static String KEY = "Toggle Held";
 
 	public Drive(){
 		
@@ -55,7 +57,7 @@ public class Drive implements Component{
        }
        
        //check if the reverse drive mode should be toggled
-       if(Robot.stick.getRawButton(XboxMap.A)){
+       if(Robot.stick.getRawButton(XboxMap.Y)){
     	   if(!toggleHeld){
     		   reverseDrive = !reverseDrive;
     		   toggleHeld = true;
@@ -64,6 +66,15 @@ public class Drive implements Component{
        else{
     	   toggleHeld = false;
        }
+       
+       //Checking and sending the toggle held state
+       if (toggleHeld = true){
+    	   SmartDashboard.putString( KEY, "Toggle Held is true");
+       }
+       else{
+    	   SmartDashboard.putString(KEY, "Toggle Held is false");
+       }
+    	   
        
        
        //set motor power variables to left stick value

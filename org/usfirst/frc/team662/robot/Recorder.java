@@ -339,7 +339,7 @@ public class Recorder implements Component{
 	}
 	
 	public void refreshFiles(){
-		
+		defaultTimers.sort((a, b) -> a.port - b.port);
 		//Make sure our folders really exist
 				File records = new File(DIRECTORY);
 				records.mkdirs();

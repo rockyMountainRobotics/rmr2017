@@ -34,7 +34,9 @@ public class Robot extends SampleRobot {
 		components.add(new CompressorSwitch());
 
 		components.add(new ClimbingMotor());
-		//components.add(new Vision());
+		components.add(new BallGrabber());
+
+		components.add(new Vision());
 		components.add(new Recorder());
 		
 		//disabled items list. Stored separately from enabled stuff

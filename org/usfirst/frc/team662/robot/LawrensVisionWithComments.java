@@ -8,15 +8,16 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.vision.VisionThread;
 
-public class LawrensVisionWithComments {
+public class LawrensVisionWithComments extends Component{
 	//Variables correspond to the triangle screenshot titled VisionTriangle.png in ThisPC >> Pictures >> ScreenShot.
 	
 	public enum State {
-		INIT, MOVE_FORWARD, TURN, STOP, END, TURN_ON_PEG, FINISH, DO_NOTHING, WAIT
+		INIT, MOVE_FORWARD, TURN, STOP, END, TURN_ON_PEG, FINISH, DO_NOTHING, CENTER
 	}
-	State state = State.INIT;
+	State state = State.DO_NOTHING;
 	
 	boolean isFinished;
+	boolean prevButton = false;
 	double right1;
 	double left1;
 	double right2;
@@ -25,23 +26,21 @@ public class LawrensVisionWithComments {
 	double robToLeftTape; //d
 	double robotXDistanceToPeg; //g
 	double robToRightTape; //e
-	final double realTapeHeight = 5; //Height of tape in real life in inches
-	final double sensorHeight = 0.68; //Height of the sensor above the ground
-	final int imageHeight = 240; //Height of the image in pixels
+	final static double REAL_TAPE_HEIGHT = 5; //Height of tape in real life in inches
+	final static double SENSOR_HEIGHT = 0.68; //Height of the sensor above the ground
+	final static int IMAGE_HEIGHT = 240; //Height of the image in pixels
 	double robotYDistanceToPeg; //q
 	double robotToPeg; //w
 	double distanceToTurn; //How far the robot needs to turn
 	double robotToEndOfPeg; //h
-	final double FOV = Math.PI/3; //60 degree field of view in radians
-	final double TARGET_SIZE = 147.06;
-	final double TURN_SPEED = .1;
-	final double STRAIGHT_SPEED = .5;
+	final static double FOV = Math.PI/3; //60 degree field of view in radians
+	final static double TARGET_SIZE = 147.06;
+	final static double TURN_SPEED = .1;
+	final static double STRAIGHT_SPEED = .5;
 	int startPositionLeft;
 	int startPositionRight;
-	CANTalon frontRightMotor = new CANTalon(3);
-	CANTalon frontLeftMotor = new CANTalon(4);
-	CANTalon rearRightMotor = new CANTalon(5);
-	CANTalon rearLeftMotor = new CANTalon(6);
+	DualTalon right = Drive.right;
+	DualTalon left = Drive.left;
 	
 	CameraServer cameraServer = CameraServer.getInstance(); 
 	UsbCamera camera = cameraServer.startAutomaticCapture();
@@ -61,8 +60,8 @@ public class LawrensVisionWithComments {
 			double rightHeight= right.y + right.height;
 			
 			//Finding the distance between the robot from the left and right tape
-			robToLeftTape = (realTapeHeight*imageHeight)/(leftHeight*sensorHeight);
-			robToRightTape = (realTapeHeight*imageHeight)/(rightHeight*sensorHeight);
+			robToLeftTape = (REAL_TAPE_HEIGHT*IMAGE_HEIGHT)/(leftHeight*SENSOR_HEIGHT);
+			robToRightTape = (REAL_TAPE_HEIGHT*IMAGE_HEIGHT)/(rightHeight*SENSOR_HEIGHT);
 			
 			//The distance between the edges of the tape is 10.25inches
 			
@@ -89,8 +88,24 @@ public class LawrensVisionWithComments {
 			robotToEndOfPeg = Math.sqrt(Math.pow(robotYDistanceToPeg-12, 2) + Math.pow(robotXDistanceToPeg, 2));
 			
 			//Peg to H distance in pixels
-			distanceToTurn = ((Math.PI - Math.acos((Math.pow(robotToPeg, 2) - Math.pow(robotToEndOfPeg, 2) - 12)/(-2*robotToEndOfPeg)))/FOV)*imageHeight;
-					
+			distanceToTurn = ((Math.PI - Math.acos((Math.pow(robotToPeg, 2) - Math.pow(robotToEndOfPeg, 2) - 12)/(-2*robotToEndOfPeg)))/FOV)*IMAGE_HEIGHT;
+			if(state == State.CENTER){
+				if (left.x > 320 - right.x){
+					left.set(TURN_SPEED);
+					right.set(-TURN_SPEED);
+					if (left.x <= 320 - right.x){
+						state = State.INIT;
+					}
+				}
+				else{
+					left.set(-TURN_SPEED);
+					right.set(TURN_SPEED);
+					if (left.x >= 320 - right.x){
+						state = State.INIT;
+					}
+				}
+				
+			}
 			if(state == State.INIT){
 				//during initialize state - set the left and right values originally, then start the next state
 				state = State.TURN;
@@ -102,10 +117,8 @@ public class LawrensVisionWithComments {
 				
 				if(robToLeftTape > robToRightTape){
 					//Turn right because we are on the right side of the tape
-					frontLeftMotor.set(TURN_SPEED);
-					rearLeftMotor.set(TURN_SPEED);
-					frontRightMotor.set(-TURN_SPEED);
-					rearRightMotor.set(-TURN_SPEED);
+					left.set(TURN_SPEED);
+					right.set(-TURN_SPEED);
 					
 					if(Math.abs(left.x - startPositionLeft) >= distanceToTurn){
 						//If we've turned far enough, move to the next state
@@ -114,10 +127,8 @@ public class LawrensVisionWithComments {
 				}
 				else{
 					//Turn left because we are on the left side of the tape
-					frontLeftMotor.set(-TURN_SPEED);
-					rearLeftMotor.set(-TURN_SPEED);
-					frontRightMotor.set(TURN_SPEED);
-					rearRightMotor.set(TURN_SPEED);
+					left.set(-TURN_SPEED);
+					right.set(TURN_SPEED);
 					
 					if(Math.abs(right.x - startPositionRight) == distanceToTurn){
 						//If we've turned far enough, move to the next state
@@ -127,22 +138,16 @@ public class LawrensVisionWithComments {
 			}
 			if(state == State.STOP){
 				//During the stop state, stop all motors and then move to the next state
-				frontLeftMotor.set(0);
-				frontRightMotor.set(0);
-				rearLeftMotor.set(0);
-				rearRightMotor.set(0);
+				left.set(0);
+				right.set(0);
+				//Used for testing pruposed. Replace with MOVE_FORWARD to continue
 				state = State.DO_NOTHING;
 			}
 			
-			
-			
-			//THIS STATE HAS ESSENTIALLY BEEN REMOVED (it never gets used)
 			if(state == State.MOVE_FORWARD){
 				//Move forward state moves the robot forward
-				frontLeftMotor.set(STRAIGHT_SPEED);
-				frontRightMotor.set(STRAIGHT_SPEED);
-				rearLeftMotor.set(STRAIGHT_SPEED);
-				rearRightMotor.set(STRAIGHT_SPEED);
+				left.set(STRAIGHT_SPEED);
+				right.set(STRAIGHT_SPEED);
 				if(left.y >= TARGET_SIZE || right.y >= TARGET_SIZE){
 					//If the robot is close enough to the peg on either side, move on to the next state
 					state = State.TURN_ON_PEG;
@@ -152,28 +157,26 @@ public class LawrensVisionWithComments {
 			
 			
 			if(state == State.TURN_ON_PEG){
-				if(left.y <= TARGET_SIZE){
-					//If the left tape is too small, turn right to face the peg head on
-					frontLeftMotor.set(TURN_SPEED);
-					frontRightMotor.set(-TURN_SPEED);
-					rearLeftMotor.set(TURN_SPEED);
-					rearRightMotor.set(-TURN_SPEED);
+				if (left.x > 320 - right.x){
+					left.set(TURN_SPEED);
+					right.set(-TURN_SPEED);
+					if (left.x <= 320 - right.x){
+						state = State.FINISH;
+					}
 				}
-				else if(right.y <= TARGET_SIZE){
-					//If the right tape is too small, turn left to face the peg head on
-					frontLeftMotor.set(-TURN_SPEED);
-					frontRightMotor.set(TURN_SPEED);
-					rearLeftMotor.set(-TURN_SPEED);
-					rearRightMotor.set(TURN_SPEED);
-				}
-				if (right.y >= TARGET_SIZE && left.y >= TARGET_SIZE){
-					state = State.FINISH;
+				else{
+					left.set(-TURN_SPEED);
+					right.set(TURN_SPEED);
+					if (left.x >= 320 - right.x){
+						state = State.FINISH;
+					}
 				}
 			}
 			if (state == State.FINISH){
-				Recorder.initializePlay(Recorder.allFound.get(VISION_FILE_NAME));
+				/*Recorder.initializePlay(Recorder.allFound.get(VISION_FILE_NAME));
 				SmartDashboard.putBoolean("playing", true);
-				Drive.isInUse = false;
+				Drive.isInUse = false;*/
+				System.out.println("We are now finished and would be playing the recording");
 				state = State.DO_NOTHING;
 			}
 			
@@ -181,11 +184,17 @@ public class LawrensVisionWithComments {
 		}
 		
 	});
-		
-		
+	public void update(){
+		if (!prevButton && Robot.stick.START){
+			state = STATE.INIT;
+		}
+		prevButton = Robot.stick.START;
+	}
+	public void autoUpdate(){
+
+	}
+	public void disable(){
+		state = STATE.DO_NOTHING;
+		prevButton = false;
+	}
 }
-	
-	
-	
-
-

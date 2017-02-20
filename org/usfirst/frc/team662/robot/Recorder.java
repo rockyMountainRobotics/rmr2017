@@ -173,6 +173,8 @@ public class Recorder implements Component{
 		//This sorts the array by port. Needed to ensure that the timings and hardwares line up even if the order they are added changes.
 		//The play method checks this more.
 		deSerialized.sort((a, b) -> a.port - b.port);
+		System.out.println("The number of objects in timers after loading: " + deSerialized.get(5).times.size());
+
 		return deSerialized;
 	}
 	
@@ -187,9 +189,14 @@ public class Recorder implements Component{
 		try {
 			//All of the io and file stuff. Create a file, then a stream, then an object stream
 			File fileLocation = new File(DIRECTORY + fileName + ".ser");
-			fileLocation.createNewFile();
-			FileOutputStream fileOut = new FileOutputStream(fileLocation);
+			if (!fileLocation.createNewFile()){
+				System.out.println("Deleting the file");
+				fileLocation.delete();
+				fileLocation.createNewFile();
+			}
+			FileOutputStream fileOut = new FileOutputStream(fileLocation, false);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			System.out.println("The number of objects in timers is: " + timers.get(5).times.size());
 			out.writeObject(timers);
 			out.close();
 			fileOut.close();
@@ -204,8 +211,15 @@ public class Recorder implements Component{
 		lastTime = GlobalTime.get();
 		//If this is the first time we are running the record code...
 		if (!hasFinished) {
+			GlobalTime.stop();
+			GlobalTime.reset(); 
 			GlobalTime.start();
-			timers = defaultTimers;
+			for (Timings timeObject : timers){
+				timeObject.times = new ArrayList<Double>();
+				timeObject.values = new ArrayList();
+			}
+			System.out.println("Just reset timers: " + timers.get(5).times.size());
+			System.out.println("DefaultTimers: " + defaultTimers.get(5).times.size());
 		}
 		//Will remain true until the recording finishes
 		hasFinished = true;
@@ -239,7 +253,7 @@ public class Recorder implements Component{
 	public static void initializePlay(File fileToLoad){
 		
 		//Set our timers object equal to whatever gets loaded.
-		timers = loadSavedRecording(fileToLoad);
+		timers = new ArrayList<Timings>(loadSavedRecording(fileToLoad));
 		isRecordingPlaying = true;
 		//A check to ensure that we have the same hardware as we had when we recorded it
 		if (pieces.size() == timers.size()) {
@@ -269,14 +283,19 @@ public class Recorder implements Component{
 	//Called every time the robot updates and SmartDashboard button set. replays any action scheduled for the specific time
 	public void play() {
 		 
+		System.out.println("Playing timer value: " + playingTimer.get());
+		
 		//If allDone is true at the end of the for loop, then everything is done.
 		boolean allDone = true;
 		for(int i = 0; i < pieces.size(); i++){
+			
 			//The Timings object currently checking in the arrayList		
 			Timings currentTimeChecking = timers.get(i);
 			
 			//If we haven't already done every action that was recorded, keep playing.
 			if (currentTimeChecking.index < currentTimeChecking.times.size()){
+				System.out.println("recorded time: " + currentTimeChecking.times.get(currentTimeChecking.index));
+				System.out.println("Playing timer value: " + playingTimer.get());
 				//Since we still have stuff to do, we aren't all done
 				allDone = false;
 				//Check if we have reached the time for the next event

@@ -66,6 +66,7 @@ public class Robot extends SampleRobot {
 	
 	public void autonomous() {
 		while (isEnabled() && isAutonomous() && autonomousSwtich.get()) {
+			System.out.println("Called Auto");
 			for (int i = components.size() - 1; i >= 0; i--) {
 				
 				//Disabling components from SmartDashboard. True if disabled.

@@ -9,8 +9,7 @@ public class BallGrabber implements Component{
 	//FIND WHAT PORT WE ARE SUPPOSED TO USE!!!
 	final static int MANIPULATOR_MOTOR_PORT = 4;
 	final static int OPENER_PORT = 1;
-	final static double MULTIPLIER = -1;
-	final static int BALL_GRAB_SPEED = 1;
+	final static int BALL_GRAB_SPEED = -1;
 	boolean isMoving = false;
 	boolean wereMoving = false;
 	
@@ -25,19 +24,20 @@ public class BallGrabber implements Component{
 	public void update(){
 	
 		//If the collector is not moving and the left trigger is pressed, turn it on
-		if(Robot.manipulatorStick.getRawButton(XboxMap.LB) && !wereMoving){
-			if (isMoving){
-				ballGrab.set(0);
+		if(Robot.manipulatorStick.getRawButton(XboxMap.LB)){
+			if (!wereMoving){
+				if (isMoving){
+					ballGrab.set(0);
+				}
+				else{
+					ballGrab.set(BALL_GRAB_SPEED);
+				}
+				wereMoving = true;
+				isMoving = !isMoving;
 			}
-			else{
-				ballGrab.set(BALL_GRAB_SPEED);
-			}
-			wereMoving = true;
-			isMoving = !isMoving;
 		}
 		else {
 			wereMoving = false;
-			isMoving = false;
 		}
 		
 		//if the b button is held, open the ball holder. Otherwise, close it

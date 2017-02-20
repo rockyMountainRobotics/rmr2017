@@ -30,7 +30,7 @@ public class GearHolder implements Component {
 	public DigitalInput limitSwitchBottom = new DigitalInput(LIMIT_SWITCH_CHANNEL_BOTTOM);
 	public DigitalInput limitSwitchMiddle = new DigitalInput(LIMIT_SWITCH_CHANNEL_MIDDLE);
 
-	double currentLocation = BOTTOM;
+	double currentLocation = TOP;
 	
 	boolean isTraveling = false;
 	boolean isManualOverride = false;
@@ -160,7 +160,9 @@ public class GearHolder implements Component {
 		
 		
 		//This actually moves the motors now. Motor should only move if called from here.
-		moveMotor(speed);
+		if (!Recorder.isRecordingPlaying){
+			moveMotor(speed);
+		}
 }
 	public void autoUpdate(){
 	}
@@ -174,13 +176,13 @@ public class GearHolder implements Component {
 	}
 	
 	public void moveMotor(double speed) {
-		
+		//System.out.println("The current speed is: " + speed);
 		if(!limitSwitchTop.get() && speed > 0){
 			speed = 0;
 			currentLocation = TOP;
 			System.out.println("Emergency stopped the motor for going too high");
 		}
-		if(!limitSwitchBottom.get() && speed < 0){
+		else if(!limitSwitchBottom.get() && speed < 0){
 			speed = 0;
 			currentLocation = BOTTOM;
 			System.out.println("Emergency stopped the motor for going too low");

@@ -7,8 +7,8 @@ public class Drive implements Component{
 	public static DualTalon left;
 	public static DualTalon right;
 	public static boolean isInUse = false;
-	final static double LEFT_MULTIPLIER = 0.4;
-	final static double RIGHT_MULTIPLIER = 0.4;
+	final static double LEFT_MULTIPLIER = 0.6;
+	final static double RIGHT_MULTIPLIER = 0.6;
 	final static double LEFT_DEADZONE = 0.15;
 	final static double RIGHT_DEADZONE = 0.15;
 	final static int FRONT_RIGHT_MOTOR = 5;
@@ -57,7 +57,7 @@ public class Drive implements Component{
        }
        
        //check if the reverse drive mode should be toggled
-       if(Robot.stick.getRawButton(XboxMap.Y)){
+       if(Robot.stick.getRawButton(XboxMap.A)){
     	   if(!toggleHeld){
     		   reverseDrive = !reverseDrive;
     		   toggleHeld = true;
@@ -68,7 +68,7 @@ public class Drive implements Component{
        }
        
        //Checking and sending the toggle held state
-       if (toggleHeld = true){
+       if (reverseDrive){
     	   SmartDashboard.putString( KEY, "Toggle Held is true");
        }
        else{

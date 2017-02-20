@@ -294,12 +294,13 @@ public class Recorder implements Component{
 			
 			//If we haven't already done every action that was recorded, keep playing.
 			if (currentTimeChecking.index < currentTimeChecking.times.size()){
-				System.out.println("recorded time: " + currentTimeChecking.times.get(currentTimeChecking.index));
-				System.out.println("Playing timer value: " + playingTimer.get());
+				
 				//Since we still have stuff to do, we aren't all done
 				allDone = false;
 				//Check if we have reached the time for the next event
 				if(currentTimeChecking.times.get(currentTimeChecking.index) <= playingTimer.get()){
+					System.out.println("recorded time: " + currentTimeChecking.times.get(currentTimeChecking.index));
+					System.out.println("Playing timer value: " + playingTimer.get());
 					//Set the motor value to whatever the recording was at this time. Also add one to index.
 					pieces.get(i).setter.accept(currentTimeChecking.values.get(currentTimeChecking.index));
 					currentTimeChecking.index++;

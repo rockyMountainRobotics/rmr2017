@@ -49,7 +49,7 @@ public class LawrensVisionWithComments implements Component{
 	VisionThread visionThread = new VisionThread(camera, new GripPipeline(), pipeline -> {
 		
 		//Check to see if the contours are empty or not.
-		if (!pipeline.filterContoursOutput().isEmpty()) 
+		if (pipeline.filterContoursOutput().size() != 2) 
 		{
 			
 			//Create rectangles things from the vision

@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.first.wpilibj.vision.VisionThread;
 
-public class LawrensVisionWithComments extends Component{
+public class LawrensVisionWithComments implements Component{
 	//Variables correspond to the triangle screenshot titled VisionTriangle.png in ThisPC >> Pictures >> ScreenShot.
 	
 	public enum State {
@@ -39,8 +39,8 @@ public class LawrensVisionWithComments extends Component{
 	final static double STRAIGHT_SPEED = .5;
 	int startPositionLeft;
 	int startPositionRight;
-	DualTalon right = Drive.right;
-	DualTalon left = Drive.left;
+	DualTalon rightMotor = Drive.right;
+	DualTalon leftMotor = Drive.left;
 	
 	CameraServer cameraServer = CameraServer.getInstance(); 
 	UsbCamera camera = cameraServer.startAutomaticCapture();
@@ -91,15 +91,15 @@ public class LawrensVisionWithComments extends Component{
 			distanceToTurn = ((Math.PI - Math.acos((Math.pow(robotToPeg, 2) - Math.pow(robotToEndOfPeg, 2) - 12)/(-2*robotToEndOfPeg)))/FOV)*IMAGE_HEIGHT;
 			if(state == State.CENTER){
 				if (left.x > 320 - right.x){
-					left.set(TURN_SPEED);
-					right.set(-TURN_SPEED);
+					leftMotor.set(TURN_SPEED);
+					rightMotor.set(-TURN_SPEED);
 					if (left.x <= 320 - right.x){
 						state = State.INIT;
 					}
 				}
 				else{
-					left.set(-TURN_SPEED);
-					right.set(TURN_SPEED);
+					leftMotor.set(-TURN_SPEED);
+					rightMotor.set(TURN_SPEED);
 					if (left.x >= 320 - right.x){
 						state = State.INIT;
 					}
@@ -117,8 +117,8 @@ public class LawrensVisionWithComments extends Component{
 				
 				if(robToLeftTape > robToRightTape){
 					//Turn right because we are on the right side of the tape
-					left.set(TURN_SPEED);
-					right.set(-TURN_SPEED);
+					leftMotor.set(TURN_SPEED);
+					rightMotor.set(-TURN_SPEED);
 					
 					if(Math.abs(left.x - startPositionLeft) >= distanceToTurn){
 						//If we've turned far enough, move to the next state
@@ -127,8 +127,8 @@ public class LawrensVisionWithComments extends Component{
 				}
 				else{
 					//Turn left because we are on the left side of the tape
-					left.set(-TURN_SPEED);
-					right.set(TURN_SPEED);
+					leftMotor.set(-TURN_SPEED);
+					rightMotor.set(TURN_SPEED);
 					
 					if(Math.abs(right.x - startPositionRight) == distanceToTurn){
 						//If we've turned far enough, move to the next state
@@ -138,16 +138,16 @@ public class LawrensVisionWithComments extends Component{
 			}
 			if(state == State.STOP){
 				//During the stop state, stop all motors and then move to the next state
-				left.set(0);
-				right.set(0);
+				leftMotor.set(0);
+				rightMotor.set(0);
 				//Used for testing pruposed. Replace with MOVE_FORWARD to continue
 				state = State.DO_NOTHING;
 			}
 			
 			if(state == State.MOVE_FORWARD){
 				//Move forward state moves the robot forward
-				left.set(STRAIGHT_SPEED);
-				right.set(STRAIGHT_SPEED);
+				leftMotor.set(STRAIGHT_SPEED);
+				rightMotor.set(STRAIGHT_SPEED);
 				if(left.y >= TARGET_SIZE || right.y >= TARGET_SIZE){
 					//If the robot is close enough to the peg on either side, move on to the next state
 					state = State.TURN_ON_PEG;
@@ -158,15 +158,15 @@ public class LawrensVisionWithComments extends Component{
 			
 			if(state == State.TURN_ON_PEG){
 				if (left.x > 320 - right.x){
-					left.set(TURN_SPEED);
-					right.set(-TURN_SPEED);
+					leftMotor.set(TURN_SPEED);
+					rightMotor.set(-TURN_SPEED);
 					if (left.x <= 320 - right.x){
 						state = State.FINISH;
 					}
 				}
 				else{
-					left.set(-TURN_SPEED);
-					right.set(TURN_SPEED);
+					leftMotor.set(-TURN_SPEED);
+					rightMotor.set(TURN_SPEED);
 					if (left.x >= 320 - right.x){
 						state = State.FINISH;
 					}
@@ -185,16 +185,16 @@ public class LawrensVisionWithComments extends Component{
 		
 	});
 	public void update(){
-		if (!prevButton && Robot.stick.START){
-			state = STATE.INIT;
+		if (!prevButton && Robot.stick.getRawButton(XboxMap.START)){
+			state = State.INIT;
 		}
-		prevButton = Robot.stick.START;
+		prevButton = Robot.stick.getRawButton(XboxMap.START);
 	}
 	public void autoUpdate(){
 
 	}
 	public void disable(){
-		state = STATE.DO_NOTHING;
+		state = State.DO_NOTHING;
 		prevButton = false;
 	}
 }

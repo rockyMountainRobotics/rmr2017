@@ -39,7 +39,7 @@ public class Recorder implements Component{
 	static final String DEFAULT_NAME = "defaultAuto";
 			
 	//Used for the recorder
-	double lastTime = -1;
+
 	boolean hasFinished = false;
 	
 	//Used for the player
@@ -54,7 +54,6 @@ public class Recorder implements Component{
 	static ArrayList<Timings> timers= new ArrayList<Timings>();
 	
 	//This one is for erasing the timers array, when required
-	static ArrayList<Timings> defaultTimers= new ArrayList<Timings>();
 
 	static class Hardware {
 		//A supplier takes no arguments and returns something. It saves a method as a variable.
@@ -110,7 +109,7 @@ public class Recorder implements Component{
 		//Port is incredibly important and is used to identify a hardware component with its saved recording
 		pieces.add(new Hardware(newGet, newSet, port));
 		timers.add(new Timings(port));
-		defaultTimers.add(new Timings(port));
+
 		System.out.println(port);
 	}
 
@@ -129,7 +128,6 @@ public class Recorder implements Component{
 		} else if (hasFinished) {
 			GlobalTime.stop();
 			GlobalTime.reset(); 
-			lastTime = -1;
 			saveRecording();
 			//Reset hasFinished
 			hasFinished = false;
@@ -208,7 +206,6 @@ public class Recorder implements Component{
 	
 	//Records movements done based on component values.
 	public void record(){
-		lastTime = GlobalTime.get();
 		//If this is the first time we are running the record code...
 		if (!hasFinished) {
 			GlobalTime.stop();
@@ -219,7 +216,7 @@ public class Recorder implements Component{
 				timeObject.values = new ArrayList();
 			}
 			System.out.println("Just reset timers: " + timers.get(5).times.size());
-			System.out.println("DefaultTimers: " + defaultTimers.get(5).times.size());
+	
 		}
 		//Will remain true until the recording finishes
 		hasFinished = true;
@@ -348,7 +345,6 @@ public class Recorder implements Component{
 		SmartDashboard.putBoolean(DO_RECORD, false);
 
 		isRecordingPlaying = false;
-		lastTime = -1;
 		hasFinished = false;
 	}
 	
@@ -383,7 +379,7 @@ public class Recorder implements Component{
 				//This is used when loading a recording.
 				pieces.sort((a, b) -> a.port - b.port);
 				timers.sort((a, b) -> a.port - b.port);
-				defaultTimers.sort((a, b) -> a.port - b.port);
+			
 	}
 	
 }

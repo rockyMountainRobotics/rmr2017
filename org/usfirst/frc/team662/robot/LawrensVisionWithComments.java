@@ -47,21 +47,20 @@ public class LawrensVisionWithComments implements Component{
 	int startPositionRight;
 	DualTalon rightMotor = Drive.right;
 	DualTalon leftMotor = Drive.left;
-	
-	CameraServer cameraServer = CameraServer.getInstance(); 
-	UsbCamera camera = cameraServer.startAutomaticCapture();
+	 
+	UsbCamera camera = CameraSwitch.currentCamera;
 	//VisionThread vthread1;
 	public LawrensVisionWithComments(){
 	    camera.setExposureManual(0);
 	    //camera.setBrightness(0);
 	    camera.setResolution(320,240);
-	    cameraServer.addCamera(camera);
+	    CameraSwitch.camServer.addCamera(camera);
 	    
 	    vthread = new VisionThread(camera, new GripPipeline(), pipeline -> {		
 			//Check to see if the contours are empty or not.
 
 			//System.out.println(pipeline.filterContoursOutput().size() + " Is the number of targest found");
-	    	SmartDashboard.putNumber("Number of targest", pipeline.filterContoursOutput().size());
+	    	SmartDashboard.putNumber("Number of targets", pipeline.filterContoursOutput().size());
 			if (pipeline.filterContoursOutput().size() == 2) 
 			{
 				//System.out.println(state + " is the state for vision");
@@ -112,7 +111,7 @@ public class LawrensVisionWithComments implements Component{
 				//Peg to H distance in pixels
 				distanceToTurn = ((Math.PI - Math.acos((Math.pow(robotToPeg, 2) - Math.pow(robotToEndOfPeg, 2) - 12)/(-2*robotToEndOfPeg)))/FOV)*IMAGE_HEIGHT;
 				if(state == State.CENTER){
-					System.out.println("In the center state. Left is: " + left.x + " and right is: " + right.x + " right width is " + right.width + " center is: " + isInCenter);
+					//System.out.println("In the center state. Left is: " + left.x + " and right is: " + right.x + " right width is " + right.width + " center is: " + isInCenter);
 					if (left.x > 320 - (right.x + right.width) && isInCenter == 0){
 						leftMotor.set(TURN_SPEED);
 						rightMotor.set(-TURN_SPEED);
@@ -145,7 +144,7 @@ public class LawrensVisionWithComments implements Component{
 				}
 				if(state == State.TURN){
 					//Turn state
-					System.out.println("In turn state");
+					//System.out.println("In turn state");
 					if(robToLeftTape > robToRightTape){
 						//Turn right because we are on the right side of the tape
 						leftMotor.set(TURN_SPEED);
@@ -171,13 +170,13 @@ public class LawrensVisionWithComments implements Component{
 					//During the stop state, stop all motors and then move to the next state
 					leftMotor.set(0);
 					rightMotor.set(0);
-					System.out.println("It has stopped");
+					//System.out.println("It has stopped");
 					//Used for testing pruposed. Replace with MOVE_FORWARD to continue
 					state = State.MOVE_FORWARD;
 				}
 				
 				if(state == State.MOVE_FORWARD){
-					System.out.println("Moving forward");
+					//System.out.println("Moving forward");
 					//Move forward state moves the robot forward
 					
 					if(left.width >= TARGET_SIZE || right.width >= TARGET_SIZE){
@@ -187,17 +186,17 @@ public class LawrensVisionWithComments implements Component{
 					if (left.width < right.width){
 						leftMotor.set(STRAIGHT_SPEED + .05);
 						rightMotor.set(STRAIGHT_SPEED);
-						System.out.println("Left higher");
+						//System.out.println("Left higher");
 					}
 					else if (left.width > right.width){
 						leftMotor.set(STRAIGHT_SPEED);
 						rightMotor.set(STRAIGHT_SPEED + .05);
-						System.out.println("right higher");
+						//System.out.println("right higher");
 					}
 					else {
 						leftMotor.set(STRAIGHT_SPEED);
 						rightMotor.set(STRAIGHT_SPEED);
-						System.out.println("neither higher");
+						//System.out.println("neither higher");
 					}
 				}
 				
@@ -222,12 +221,12 @@ public class LawrensVisionWithComments implements Component{
 				if (state == State.FINISH){
 					leftMotor.set(0);
 					rightMotor.set(0);
-					System.out.println("Before it is: " + Recorder.isRecordingPlaying);
+					//System.out.println("Before it is: " + Recorder.isRecordingPlaying);
 					Recorder.initializePlay(Recorder.allFound.get(VISION_FILE_NAME));
-					System.out.println("After it is: " + Recorder.isRecordingPlaying);
+					//System.out.println("After it is: " + Recorder.isRecordingPlaying);
 					SmartDashboard.putBoolean(Recorder.DO_PLAY, true);
 					Drive.isInUse = false;
-					System.out.println("We are now finished and would be playing the recording");
+					//System.out.println("We are now finished and would be playing the recording");
 					state = State.DO_NOTHING;
 				}
 				if (state == State.DO_NOTHING){
@@ -241,7 +240,7 @@ public class LawrensVisionWithComments implements Component{
 				leftMotor.set(0);
 				rightMotor.set(0);
 				isInCenter = 0;
-				System.out.println("Couldn't find two targets");
+				//System.out.println("Couldn't find two targets");
 			}
 		
 		});
@@ -259,6 +258,8 @@ public class LawrensVisionWithComments implements Component{
 			}
 		}
 		prevButton = Robot.stick.getRawButton(XboxMap.START);
+		SmartDashboard.putString("Vision State", state.name());
+
 	}
 	boolean prevRecorderState = false;
 	public void autoUpdate(){

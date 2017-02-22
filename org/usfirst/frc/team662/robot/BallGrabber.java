@@ -47,6 +47,7 @@ public class BallGrabber implements Component{
 		else{
 			ballPlace.set(false);
 		}
+		
 	}
 	@Override
 	public void autoUpdate() {

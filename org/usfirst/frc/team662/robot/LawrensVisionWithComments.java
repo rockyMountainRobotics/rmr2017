@@ -248,6 +248,7 @@ public class LawrensVisionWithComments implements Component{
 	    vthread.start();	    
 	}
 	public void update(){
+		VisionCamera();
 		if (!prevButton && Robot.stick.getRawButton(XboxMap.START)){
 			if (state == State.DO_NOTHING){
 				state = State.CENTER;
@@ -262,6 +263,7 @@ public class LawrensVisionWithComments implements Component{
 	}
 	boolean prevRecorderState = false;
 	public void autoUpdate(){
+		TeleopCamera();
 		if (prevRecorderState && !Recorder.isRecordingPlaying && state == State.WAIT){
 			state = State.CENTER;
 			Drive.isInUse = true;
@@ -273,5 +275,21 @@ public class LawrensVisionWithComments implements Component{
 		prevButton = false;
 		isInCenter = 0;
 		//vthread.stop();
+	}
+	
+	//vision camera settings
+	public void VisionCamera()
+	{
+		camera.setExposureManual(0);
+    	//camera.setBrightness(0);
+	}
+    
+	
+	//teleop camera settings
+	public void TeleopCamera()
+	{
+	    camera.setExposureAuto();
+	    //camera.setBrightness(0);
+	    
 	}
 }

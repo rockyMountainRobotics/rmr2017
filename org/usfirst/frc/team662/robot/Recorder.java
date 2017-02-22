@@ -34,7 +34,7 @@ public class Recorder implements Component{
 	static final String FILE_NAME = "File name";
 	static final String DO_RECORD = "Create recording";
 	static final String DO_DELETE = "Delete rcording";
-	public static final String DO_PLAY = "Play recording";
+	static final String DO_PLAY = "Play recording";
 	static final String DO_REFRESH = "Refresh the available files";
 	static final String DEFAULT_NAME = "defaultAuto";
 			
@@ -75,7 +75,7 @@ public class Recorder implements Component{
 		//Same reason as Hardware
 		public int port;
 		//When playing back, this value keeps track of which event we are on and where we are in the ArrayLists below
-		public int index = 0;
+		public int index;
 		//The list of times. We can actually use the non-raw form!
 		public ArrayList<Double> times;
 		//The list of values. Will be whatever type the supplier returns
@@ -214,7 +214,6 @@ public class Recorder implements Component{
 			for (Timings timeObject : timers){
 				timeObject.times = new ArrayList<Double>();
 				timeObject.values = new ArrayList();
-				timeObject.index = 0;
 			}
 			System.out.println("Just reset timers: " + timers.get(5).times.size());
 	
@@ -240,7 +239,6 @@ public class Recorder implements Component{
 			//There should be no time when the motor and its recordings should be of different type making this safe
 			if (gottenTimer.values.size() == 0 || !currentHardwareValue.getClass().cast(currentHardwareValue).equals(previousTimerValue.getClass().cast(previousTimerValue))) {
 				//Add the current time and the value to the array.
-				System.out.println("The current time is: " + GlobalTime.get());
 				gottenTimer.times.add(GlobalTime.get());
 				gottenTimer.values.add(gottenPiece.getter.get());
 			}

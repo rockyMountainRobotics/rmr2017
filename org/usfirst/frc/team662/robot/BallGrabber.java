@@ -2,6 +2,7 @@ package org.usfirst.frc.team662.robot;
 import com.ctre.CANTalon;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.SpeedController;
 
 public class BallGrabber implements Component{
@@ -12,13 +13,14 @@ public class BallGrabber implements Component{
 	final static double BALL_GRAB_SPEED = -1;
 	boolean isMoving = false;
 	boolean wereMoving = false;
-	
+	final static int BALLSERVO = 90;
+	final static int BALLSERVOMIN = 0;
 
 
 	final static double GRAB_DEADZONE = 0.1;
 	CANTalon ballGrab = new CANTalon(MANIPULATOR_MOTOR_PORT);
 	Solenoid ballPlace = new Solenoid(OPENER_PORT);
-
+	Servo ballPlaceTwo = new Servo(OPENER_PORT);
 	
 	@Override
 	public void update(){
@@ -46,6 +48,14 @@ public class BallGrabber implements Component{
 		}
 		else{
 			ballPlace.set(false);
+		}
+		
+		//if the b button is held, open the ball holder. Otherwise, close it
+		if(Robot.manipulatorStick.getRawButton(XboxMap.B)){
+			ballPlaceTwo.setAngle(BALLSERVO);
+		}
+		else{
+			ballPlaceTwo.setAngle(BALLSERVOMIN);
 		}
 		
 	}

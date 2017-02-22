@@ -17,8 +17,12 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class Recorder implements Component{
+import com.google.gson.Gson;
 
+public class Recorder implements Component{
+	
+	Gson gson = new Gson();
+	
 	//Timers used for recording and playing
 	Timer GlobalTime = new Timer();
 	static Timer playingTimer = new Timer();
@@ -37,6 +41,7 @@ public class Recorder implements Component{
 	static final String DO_PLAY = "Play recording";
 	static final String DO_REFRESH = "Refresh the available files";
 	static final String DEFAULT_NAME = "defaultAuto";
+	static final String MAKE_READABLE = "make readable";
 			
 	//Used for the recorder
 
@@ -149,6 +154,11 @@ public class Recorder implements Component{
 			delete();
 		}
 		
+		if(SmartDashboard.getBoolean(MAKE_READABLE, false)) {
+			makeReadable(timers);
+			makeReadable(pieces);
+			SmartDashboard.putBoolean(MAKE_READABLE, false);
+		}
 	}
 	
 	//Load whatever the saved file is
@@ -380,6 +390,9 @@ public class Recorder implements Component{
 				pieces.sort((a, b) -> a.port - b.port);
 				timers.sort((a, b) -> a.port - b.port);
 			
+	}
+	public void makeReadable(ArrayList thingToPrint) {
+		System.out.println(gson.toJson(thingToPrint));
 	}
 	
 }

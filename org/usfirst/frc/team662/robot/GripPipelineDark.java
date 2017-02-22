@@ -42,7 +42,7 @@ public class GripPipelineDark implements VisionPipeline {
 	@Override	public void process(Mat source0) {
 		// Step HSV_Threshold0:
 		Mat hsvThresholdInput = source0;
-		double[] hsvThresholdHue = {67.98561151079136, 138.53242320819112};
+		double[] hsvThresholdHue = {52, 138.53242320819112};
 		double[] hsvThresholdSaturation = {0.0, 255.0};
 		double[] hsvThresholdValue = {36.690647482014384, 255.0};
 		hsvThreshold(hsvThresholdInput, hsvThresholdHue, hsvThresholdSaturation, hsvThresholdValue, hsvThresholdOutput);

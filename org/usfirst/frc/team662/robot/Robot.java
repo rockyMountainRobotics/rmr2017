@@ -36,6 +36,7 @@ public class Robot extends SampleRobot {
 		components.add(new ClimbingMotor());
 		components.add(new BallGrabber());
 		System.out.println("Calling the vision stuff");
+		components.add(new CameraSwitch());
 		components.add(new LawrensVisionWithComments());
 		components.add(new Recorder());
 		

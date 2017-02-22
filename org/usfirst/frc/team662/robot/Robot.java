@@ -35,8 +35,8 @@ public class Robot extends SampleRobot {
 
 		components.add(new ClimbingMotor());
 		components.add(new BallGrabber());
-
-		components.add(new Vision());
+		System.out.println("Calling the vision stuff");
+		components.add(new LawrensVisionWithComments());
 		components.add(new Recorder());
 		
 		//disabled items list. Stored separately from enabled stuff
@@ -44,7 +44,6 @@ public class Robot extends SampleRobot {
 		for(Component i : components){
 			SmartDashboard.putBoolean(i.getClass().getName(), true);
 		}
-		
 		
 	}
 

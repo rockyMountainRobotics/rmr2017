@@ -9,7 +9,7 @@ public class BallGrabber implements Component{
 	//FIND WHAT PORT WE ARE SUPPOSED TO USE!!!
 	final static int MANIPULATOR_MOTOR_PORT = 4;
 	final static int OPENER_PORT = 1;
-	final static int BALL_GRAB_SPEED = -1;
+	final static double BALL_GRAB_SPEED = -1;
 	boolean isMoving = false;
 	boolean wereMoving = false;
 	

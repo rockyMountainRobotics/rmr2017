@@ -35,7 +35,6 @@ public class Robot extends SampleRobot {
 
 		components.add(new ClimbingMotor());
 		components.add(new BallGrabber());
-		System.out.println("Calling the vision stuff");
 		components.add(new CameraSwitch());
 		components.add(new LawrensVisionWithComments());
 		components.add(new Recorder());
@@ -66,7 +65,6 @@ public class Robot extends SampleRobot {
 	
 	public void autonomous() {
 		while (isEnabled() && isAutonomous() && autonomousSwtich.get()) {
-			System.out.println("Called Auto");
 			for (int i = components.size() - 1; i >= 0; i--) {
 				
 				//Disabling components from SmartDashboard. True if disabled.
@@ -87,9 +85,7 @@ public class Robot extends SampleRobot {
 			}
 		}
 	}
-	/**
-	 * Runs the motors with arcade steering.
-	 */
+
 	public void operatorControl() {
 		while (isOperatorControl() && isEnabled()) {
 			for (int i = components.size() - 1; i >= 0; i--) {

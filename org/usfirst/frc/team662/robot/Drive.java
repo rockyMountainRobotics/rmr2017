@@ -7,8 +7,8 @@ public class Drive implements Component{
 	public static DualTalon left;
 	public static DualTalon right;
 	public static boolean isInUse = false;
-	final static double LEFT_MULTIPLIER = 0.6;
-	final static double RIGHT_MULTIPLIER = 0.6;
+	final static double LEFT_MULTIPLIER = 1;
+	final static double RIGHT_MULTIPLIER = 1;
 	final static double LEFT_DEADZONE = 0.15;
 	final static double RIGHT_DEADZONE = 0.15;
 	final static int FRONT_RIGHT_MOTOR = 5;

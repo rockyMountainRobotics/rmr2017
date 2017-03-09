@@ -16,12 +16,9 @@ public class DualTalon implements SpeedController {
 	public DualTalon(int leftChannel, int rightChannel) {
 		leftPort = leftChannel;
 		rightPort = rightChannel;
-		initDualTalon(new CANTalon(leftChannel), new CANTalon(rightChannel));
-	}
-	
-	private void initDualTalon(CANTalon left, CANTalon right) {
-		this.left = left;
-		this.right = right;
+		
+		left = new CANTalon(leftChannel);
+		right = new CANTalon(rightChannel);
 		
 		Recorder.addRecordable(() -> left.get(), (speed) -> left.set((double)speed), leftPort);
 		Recorder.addRecordable(() -> right.get(), (speed) -> right.set((double)speed), rightPort);

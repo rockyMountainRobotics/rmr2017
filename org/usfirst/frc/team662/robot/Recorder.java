@@ -100,6 +100,7 @@ public class Recorder implements Component{
 		SmartDashboard.putBoolean(DO_RECORD, false);
 		SmartDashboard.putBoolean(DO_DELETE, false);
 		SmartDashboard.putBoolean(DO_REFRESH, false);
+		SmartDashboard.putBoolean(MAKE_READABLE, false);
 
 		SmartDashboard.putString(FILE_NAME, DEFAULT_NAME);
 
@@ -156,13 +157,13 @@ public class Recorder implements Component{
 		
 		if(SmartDashboard.getBoolean(MAKE_READABLE, false)) {
 			makeReadable(timers);
-			makeReadable(pieces);
+			//makeReadable(pieces);
 			SmartDashboard.putBoolean(MAKE_READABLE, false);
 		}
 	}
 	
 	//Load whatever the saved file is
-	static ArrayList loadSavedRecording(File fileToLoad) {
+	static ArrayList<Timings> loadSavedRecording(File fileToLoad) {
 		//Create where we will save the loaded thing
 		ArrayList<Timings> deSerialized = new ArrayList<Timings>();
 
@@ -238,7 +239,7 @@ public class Recorder implements Component{
 			Hardware gottenPiece = pieces.get(i);
 			
 			//Store the object for the previous timer value so we only have to save when it changes.
-			Object previousTimerValue = -1;
+			Object previousTimerValue = -2;
 			if (gottenTimer.values.size() != 0){
 				previousTimerValue = gottenTimer.values.get(gottenTimer.values.size() - 1);
 			}
@@ -322,15 +323,14 @@ public class Recorder implements Component{
 			//Reset everything back
 			isRecordingPlaying = false;
 			SmartDashboard.putBoolean(DO_PLAY, false);
-		}
-
-			
+		}	
 	}
 	
 	public void delete() {
 			//Delete the specified file
 			File deletionFile = autoChooser.getSelected();
 			deletionFile.delete();
+			SmartDashboard.putBoolean(DO_DELETE, false);
 	}
 	
 	@Override

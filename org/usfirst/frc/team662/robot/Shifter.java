@@ -32,7 +32,6 @@ public class Shifter implements Component{
 
 	@Override
 	public void disable() {
-		// TODO Auto-generated method stub
 		
 	}
 	

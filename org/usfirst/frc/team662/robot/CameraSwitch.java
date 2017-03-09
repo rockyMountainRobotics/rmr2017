@@ -14,7 +14,7 @@ public class CameraSwitch implements Component{
 	public static CameraServer camServer = CameraServer.getInstance();
 	public static UsbCamera currentCamera;
 	public final UsbCamera FRONT_CAMERA = camServer.startAutomaticCapture(FRONT_CAMERA_PORT);
-	public final UsbCamera TOP_CAMERA = camServer.startAutomaticCapture(TOP_CAMERA_PORT);
+	//public final UsbCamera TOP_CAMERA = camServer.startAutomaticCapture(TOP_CAMERA_PORT);
 	
 	
 	public CameraSwitch() {
@@ -23,6 +23,7 @@ public class CameraSwitch implements Component{
 	}
 	
 	public void update() {
+		currentCamera.setExposureAuto();
 		/*
 		if(Robot.stick.getRawButton(XboxMap.BACK)) {
 			currentCamera = TOP_CAMERA;
@@ -36,7 +37,8 @@ public class CameraSwitch implements Component{
 	}
 
 	public void autoUpdate() {
-		
+	    //currentCamera.setExposureManual(0);
+
 	}
 	public void disable() {
 		

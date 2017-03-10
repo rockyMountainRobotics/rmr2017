@@ -1,8 +1,10 @@
 package org.usfirst.frc.team662.robot;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Timer;
 
 public class Drive implements Component{
+	Timer autoTime = new Timer();
 	RobotDrive driver; 
 	public static DualTalon left;
 	public static DualTalon right;

@@ -20,8 +20,14 @@ public class DualTalon implements SpeedController {
 		left = new CANTalon(leftChannel);
 		right = new CANTalon(rightChannel);
 		
-		Recorder.addRecordable(() -> left.get(), (speed) -> left.set((double)speed), leftPort);
-		Recorder.addRecordable(() -> right.get(), (speed) -> right.set((double)speed), rightPort);
+		//Recorder.addRecordable(() -> left.get(), (speed) -> left.set((double)speed), leftPort);
+		Recorder.addRecordable(() -> get(), (speed) -> left.set((double)speed), leftPort);
+		//Recorder.addRecordable(() -> {System.out.println(left.get()); return left.get();}, (speed) -> left.set((double)speed), leftPort);
+
+		//Recorder.addRecordable(() -> right.get(), (speed) -> right.set((double)speed), rightPort);
+		Recorder.addRecordable(() -> get(), (speed) -> right.set((double)speed), rightPort);
+
+		
 		
 		currentSpeed = 0;
 		leftSpeedMultiplier = rightSpeedMultiplier = 1.0;
@@ -81,12 +87,14 @@ public class DualTalon implements SpeedController {
 			speed = 1;
 		}
 		
+		
 		currentSpeed = speed;
+		//System.out.println(speed);
 		
 		left.set(leftSpeedMultiplier * currentSpeed);
 		right.set(rightSpeedMultiplier * currentSpeed);
 	}
-
+	
 	// Does nothing
 	@Override
 	public void setInverted(boolean isInverted) {

@@ -22,8 +22,17 @@ public class CameraSwitch implements Component{
 		NetworkTable.getTable("").putString("Current Camera", currentCamera.getName());
 	}
 	
+	boolean currentExposure = false; //False means manual. True is auto
 	public void update() {
-		currentCamera.setExposureAuto();
+		try {
+			if (!currentExposure){
+				currentCamera.setExposureAuto();
+			}
+		}
+		catch (Exception e){
+			return;
+		}
+		currentExposure = true;
 		/*
 		if(Robot.stick.getRawButton(XboxMap.BACK)) {
 			currentCamera = TOP_CAMERA;

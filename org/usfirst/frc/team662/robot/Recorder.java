@@ -225,6 +225,7 @@ public class Recorder implements Component{
 			for (Timings timeObject : timers){
 				timeObject.times = new ArrayList<Double>();
 				timeObject.values = new ArrayList();
+				timeObject.index = 0;
 			}
 			System.out.println("Just reset timers: " + timers.get(5).times.size());
 	
@@ -246,12 +247,16 @@ public class Recorder implements Component{
 			Object currentHardwareValue = gottenPiece.getter.get();
 			
 			
+			
 			//Basically, we can't actually compare two plain objects because it will always be false. This casts it to whatever the subclass is
 			//There should be no time when the motor and its recordings should be of different type making this safe
 			if (gottenTimer.values.size() == 0 || !currentHardwareValue.getClass().cast(currentHardwareValue).equals(previousTimerValue.getClass().cast(previousTimerValue))) {
 				//Add the current time and the value to the array.
 				gottenTimer.times.add(GlobalTime.get());
 				gottenTimer.values.add(gottenPiece.getter.get());
+				/*if (((Double)currentHardwareValue) == 0){
+					System.out.println("RECORDED A ZERO");
+				}*/
 			}
 			
 		}
@@ -291,7 +296,7 @@ public class Recorder implements Component{
 	//Called every time the robot updates and SmartDashboard button set. replays any action scheduled for the specific time
 	public void play() {
 		 
-		System.out.println("Playing timer value: " + playingTimer.get());
+		//System.out.println("Playing timer value: " + playingTimer.get());
 		
 		//If allDone is true at the end of the for loop, then everything is done.
 		boolean allDone = true;
@@ -306,11 +311,17 @@ public class Recorder implements Component{
 				//Since we still have stuff to do, we aren't all done
 				allDone = false;
 				//Check if we have reached the time for the next event
-				if(currentTimeChecking.times.get(currentTimeChecking.index) <= playingTimer.get()){
-					System.out.println("recorded time: " + currentTimeChecking.times.get(currentTimeChecking.index));
-					System.out.println("Playing timer value: " + playingTimer.get());
+				//New code below:
+				double ourTime = playingTimer.get();
+				if(currentTimeChecking.times.get(currentTimeChecking.index) <= ourTime){
+					//System.out.println("recorded time: " + currentTimeChecking.times.get(currentTimeChecking.index));
+					//System.out.println("Playing timer value: " + playingTimer.get());
 					//Set the motor value to whatever the recording was at this time. Also add one to index.
+					System.out.println("For: " + currentTimeChecking.index + "The current time is: " + (currentTimeChecking.values.get(currentTimeChecking.index)));
 					pieces.get(i).setter.accept(currentTimeChecking.values.get(currentTimeChecking.index));
+					/*if (currentTimeChecking.values.get(currentTimeChecking.index) == 0){
+						System.out.println("WE FOUND A ZERO");
+					}*/
 					currentTimeChecking.index++;
 					
 				}

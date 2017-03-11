@@ -281,7 +281,7 @@ public class LawrensVisionWithComments implements Component{
 	//vision camera settings
 	public void VisionCamera()
 	{
-		camera.setExposureManual(0);
+		//camera.setExposureManual(0);
     	//camera.setBrightness(0);
 	}
     
@@ -289,7 +289,7 @@ public class LawrensVisionWithComments implements Component{
 	//teleop camera settings
 	public void TeleopCamera()
 	{
-	    camera.setExposureAuto();
+	    //camera.setExposureAuto();
 	    //camera.setBrightness(0);
 	    
 	}

@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Timer;
 
 public class Drive implements Component{
-	Timer autoTime = new Timer();
+	Timer autoTimer = new Timer();
 	RobotDrive driver; 
 	public static DualTalon left;
 	public static DualTalon right;
@@ -17,6 +17,8 @@ public class Drive implements Component{
 	final static int REAR_RIGHT_MOTOR = 3;
 	final static int FRONT_LEFT_MOTOR = 6;
 	final static int REAR_LEFT_MOTOR = 8;
+	final static double AUTO_SPEED = -.375;
+	final static double AUTO_FORWARD = 3;
 	boolean reverseDrive;
 	boolean toggleHeld;
 	final static String KEY = "Toggle Held";
@@ -35,9 +37,18 @@ public class Drive implements Component{
 		//driver = new RobotDrive(left,right);
 				
 	}
-	
 	public void autoUpdate(){
-		
+		if (autoTimer.get() == 0){
+			autoTimer.start();
+		}
+		if (autoTimer.get() <= AUTO_FORWARD){
+			left.set(AUTO_SPEED);
+			right.set(AUTO_SPEED);
+		}
+		else{
+			left.set(0);
+			right.set(0);
+		}
 	}
 	
 	public void update(){
@@ -68,8 +79,7 @@ public class Drive implements Component{
        else{
     	   toggleHeld = false;
        }
-       
-       //Checking and sending the toggle held state
+              //Checking and sending the toggle held state
        if (reverseDrive){
     	   SmartDashboard.putString( KEY, "Toggle Held is true");
        }
@@ -143,6 +153,8 @@ public class Drive implements Component{
 		left.set(0);
 		right.set(0);
 		isInUse = false;
+		autoTimer.stop();
+		autoTimer.reset();
 	}
 	
 }

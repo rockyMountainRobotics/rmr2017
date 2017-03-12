@@ -236,7 +236,7 @@ public class LawrensVisionWithComments implements Component{
 				
 				
 			}
-			else{
+			else if (state != State.DO_NOTHING){
 				leftMotor.set(0);
 				rightMotor.set(0);
 				isInCenter = 0;
@@ -265,11 +265,11 @@ public class LawrensVisionWithComments implements Component{
 	boolean prevRecorderState = false;
 	public void autoUpdate(){
 		TeleopCamera();
-		if (prevRecorderState && !Recorder.isRecordingPlaying && state == State.WAIT){
+		/*if (prevRecorderState && !Recorder.isRecordingPlaying && state == State.WAIT){
 			state = State.CENTER;
 			Drive.isInUse = true;
 		}
-		prevRecorderState = Recorder.isRecordingPlaying;
+		prevRecorderState = Recorder.isRecordingPlaying;*/
 	}
 	public void disable(){
 		state = State.DO_NOTHING;

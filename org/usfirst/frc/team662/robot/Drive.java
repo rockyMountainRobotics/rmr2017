@@ -35,6 +35,10 @@ public class Drive implements Component{
 		right.setMultiplier(RIGHT_MULTIPLIER);
 		
 		//driver = new RobotDrive(left,right);
+		
+		
+		
+		
 				
 	}
 	public void autoUpdate(){

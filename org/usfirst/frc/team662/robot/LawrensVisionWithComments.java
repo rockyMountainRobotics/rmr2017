@@ -49,11 +49,10 @@ public class LawrensVisionWithComments implements Component{
 	DualTalon leftMotor = Drive.left;
 	 
 	UsbCamera camera = CameraSwitch.currentCamera;
-	//VisionThread vthread1;
 	public LawrensVisionWithComments(){
+	    camera.setResolution(320,240);
 	    camera.setExposureManual(0);
 	    //camera.setBrightness(0);
-	    camera.setResolution(320,240);
 	    CameraSwitch.camServer.addCamera(camera);
 	    
 	    vthread = new VisionThread(camera, new GripPipeline(), pipeline -> {		

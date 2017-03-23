@@ -165,6 +165,9 @@ public class GearHolder implements Component {
 		}
 }
 	public void autoUpdate(){
+		//Recorder will move the motor but only call it once instead of every time. This prevents safety stopping. Calling it here fixes it and will stop motors
+		//Anytime they reach the switches. 
+		moveMotor(manipulatorMotor.get());
 	}
 	
 	@Override

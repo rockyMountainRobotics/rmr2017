@@ -1,0 +1,87 @@
+<xml version="1.0">
+<dashboard>
+	<widget field="make readable" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="341"/>
+	</widget>
+	<widget field="Vision State" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="289"/>
+	</widget>
+	<widget field="Number of targets" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="21"/>
+	</widget>
+	<widget field="org.usfirst.frc.team662.robot.CameraSwitch" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="0"/>
+	</widget>
+	<widget field="Create recording" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
+		<location x="976" y="59"/>
+	</widget>
+	<widget field="Play recording" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.CheckBox">
+		<location x="1120" y="59"/>
+	</widget>
+	<widget field="Holder state" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="975" y="428"/>
+	</widget>
+	<widget field="Toggle Held" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="976" y="368"/>
+		<width>166</width>
+	</widget>
+	<widget field="High Gear" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="976" y="400"/>
+	</widget>
+	<static-widget class="edu.wpi.first.smartdashboard.gui.elements.CameraServerViewer">
+		<location x="359" y="0"/>
+		<width>611</width>
+		<height>646</height>
+		<property name="Camera Choice" value=""/>
+	</static-widget>
+	<widget field="Size left" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="32" y="320"/>
+		<width>112</width>
+	</widget>
+	<widget field="File name" type="String" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="976" y="92"/>
+	</widget>
+	<widget field="Size right " type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="192" y="320"/>
+		<width>128</width>
+	</widget>
+	<widget field="org.usfirst.frc.team662.robot.GearHolder" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="64" y="108"/>
+		<width>288</width>
+	</widget>
+	<widget field="Delete rcording" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="1064" y="229"/>
+	</widget>
+	<widget field="org.usfirst.frc.team662.robot.CompressorSwitch" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="31" y="204"/>
+	</widget>
+	<widget field="autoFiles" type="String Chooser" class="edu.wpi.first.smartdashboard.gui.elements.Chooser">
+		<location x="1184" y="80"/>
+		<property name="Use Radio Buttons" value="false"/>
+	</widget>
+	<widget field="org.usfirst.frc.team662.robot.BallGrabber" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="64" y="236"/>
+	</widget>
+	<widget field="Refresh the available files" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="976" y="160"/>
+	</widget>
+	<widget field="org.usfirst.frc.team662.robot.Recorder" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="75" y="268"/>
+	</widget>
+	<widget field="org.usfirst.frc.team662.robot.LawrensVisionWithComments" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="-20" y="140"/>
+	</widget>
+	<widget field="org.usfirst.frc.team662.robot.ClimbingMotor" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="52" y="76"/>
+		<height>20</height>
+	</widget>
+	<widget field="org.usfirst.frc.team662.robot.Shifter" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="87" y="44"/>
+	</widget>
+	<widget field="org.usfirst.frc.team662.robot.Drive" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="94" y="172"/>
+	</widget>
+</dashboard>
+<live-window>
+</live-window>
+</xml>

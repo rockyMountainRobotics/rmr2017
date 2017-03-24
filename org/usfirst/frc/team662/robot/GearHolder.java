@@ -40,7 +40,7 @@ public class GearHolder implements Component {
 	public GearHolder(){
 		
 		Recorder.addRecordable(() -> manipulatorMotor.get(), (speed) -> moveMotor((double)speed), MANIPULATOR_MOTOR_PORT_2);
-		
+		//Recorder.addRecordable(() -> manipulatorMotor.get(), (speed) -> this.speed = (double)speed, MANIPULATOR_MOTOR_PORT_2);
 	}
 	
 	public void update(){
@@ -166,8 +166,19 @@ public class GearHolder implements Component {
 }
 	public void autoUpdate(){
 		//Recorder will move the motor but only call it once instead of every time. This prevents safety stopping. Calling it here fixes it and will stop motors
-		//Anytime they reach the switches. 
-		moveMotor(manipulatorMotor.get());
+		//Any time they reach the switches. 
+		double speed = manipulatorMotor.get();
+		if(!limitSwitchTop.get() && speed > 0){
+			manipulatorMotor.set(0);
+			currentLocation = TOP;
+			System.out.println("Emergency stopped the motor for going too high");
+		}
+		else if(!limitSwitchBottom.get() && speed < 0){
+			manipulatorMotor.set(0);
+			currentLocation = BOTTOM;
+			System.out.println("Emergency stopped the motor for going too low");
+		}
+		
 	}
 	
 	@Override

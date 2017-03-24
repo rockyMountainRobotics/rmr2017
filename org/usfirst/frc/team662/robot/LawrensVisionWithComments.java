@@ -40,9 +40,9 @@ public class LawrensVisionWithComments implements Component{
 	double distanceToTurn; //How far the robot needs to turn
 	double robotToEndOfPeg; //h
 	final static double FOV = Math.PI/3; //60 degree field of view in radians
-	final static double TARGET_SIZE = 43;
-	final static double TURN_SPEED = .3;
-	final static double STRAIGHT_SPEED = -.3;
+	final static double TARGET_SIZE = 60;
+	final static double TURN_SPEED = .2;
+	final static double STRAIGHT_SPEED = -.2;
 	int startPositionLeft;
 	int startPositionRight;
 	DualTalon rightMotor = Drive.right;
@@ -55,7 +55,7 @@ public class LawrensVisionWithComments implements Component{
 	    //camera.setBrightness(0);
 	    CameraSwitch.camServer.addCamera(camera);
 	    
-	    vthread = new VisionThread(camera, new GripPipeline(), pipeline -> {		
+	    vthread = new VisionThread(camera, new GripPipelineDark(), pipeline -> {		
 			//Check to see if the contours are empty or not.
 
 			//System.out.println(pipeline.filterContoursOutput().size() + " Is the number of targest found");
@@ -71,8 +71,8 @@ public class LawrensVisionWithComments implements Component{
 					left = right;
 					right = temp;
 				}
-				SmartDashboard.putNumber("Size right ", right.width);
-				SmartDashboard.putNumber("Size left", left.width);
+				SmartDashboard.putNumber("Size right ", right.height);
+				SmartDashboard.putNumber("Size left", left.height);
 
 
 				
@@ -114,13 +114,15 @@ public class LawrensVisionWithComments implements Component{
 					if (left.x > 320 - (right.x + right.width) && isInCenter == 0){
 						leftMotor.set(TURN_SPEED);
 						rightMotor.set(-TURN_SPEED);
-						isInCenter = -1;
+						//isInCenter = -1;
+						isInCenter = 1;
 						
 					}
 					else if (isInCenter == 0){
 						leftMotor.set(-TURN_SPEED);
 						rightMotor.set(TURN_SPEED);
-						isInCenter = 1;
+						//isInCenter = 1;
+						isInCenter = -1;
 						
 					}
 					
@@ -170,7 +172,6 @@ public class LawrensVisionWithComments implements Component{
 					leftMotor.set(0);
 					rightMotor.set(0);
 					//System.out.println("It has stopped");
-					//Used for testing pruposed. Replace with MOVE_FORWARD to continue
 					state = State.MOVE_FORWARD;
 				}
 				
@@ -178,16 +179,16 @@ public class LawrensVisionWithComments implements Component{
 					//System.out.println("Moving forward");
 					//Move forward state moves the robot forward
 					
-					if(left.width >= TARGET_SIZE || right.width >= TARGET_SIZE){
+					if(left.height >= TARGET_SIZE || right.height >= TARGET_SIZE){
 						//If the robot is close enough to the peg on either side, move on to the next state
 						state = State.FINISH;
 					}
-					if (left.width < right.width){
+					else if (left.height < right.height){
 						leftMotor.set(STRAIGHT_SPEED + .05);
 						rightMotor.set(STRAIGHT_SPEED);
 						//System.out.println("Left higher");
 					}
-					else if (left.width > right.width){
+					else if (left.height > right.height){
 						leftMotor.set(STRAIGHT_SPEED);
 						rightMotor.set(STRAIGHT_SPEED + .05);
 						//System.out.println("right higher");
@@ -235,7 +236,7 @@ public class LawrensVisionWithComments implements Component{
 				
 				
 			}
-			else if (state != State.DO_NOTHING){
+			else if (state != State.DO_NOTHING && state != State.WAIT){
 				leftMotor.set(0);
 				rightMotor.set(0);
 				isInCenter = 0;
@@ -259,19 +260,20 @@ public class LawrensVisionWithComments implements Component{
 		}
 		prevButton = Robot.stick.getRawButton(XboxMap.START);
 		SmartDashboard.putString("Vision State", state.name());
-
 	}
 	boolean prevRecorderState = false;
 	public void autoUpdate(){
 		TeleopCamera();
-		/*if (prevRecorderState && !Recorder.isRecordingPlaying && state == State.WAIT){
+		if (prevRecorderState && !Recorder.isRecordingPlaying && state == State.WAIT){
 			state = State.CENTER;
 			Drive.isInUse = true;
 		}
-		prevRecorderState = Recorder.isRecordingPlaying;*/
+		prevRecorderState = Recorder.isRecordingPlaying;
+		SmartDashboard.putString("Vision State", state.name());
+
 	}
 	public void disable(){
-		state = State.DO_NOTHING;
+		state = State.WAIT;
 		prevButton = false;
 		isInCenter = 0;
 		//vthread.stop();

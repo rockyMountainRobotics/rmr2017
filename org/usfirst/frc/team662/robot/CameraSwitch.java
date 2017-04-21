@@ -26,7 +26,7 @@ public class CameraSwitch implements Component{
 	public void update() {
 		try {
 			if (!currentExposure){
-				currentCamera.setExposureAuto();
+				//currentCamera.setExposureAuto();
 			}
 		}
 		catch (Exception e){

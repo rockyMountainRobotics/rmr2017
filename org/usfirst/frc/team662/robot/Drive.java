@@ -42,6 +42,7 @@ public class Drive implements Component{
 				
 	}
 	public void autoUpdate(){
+		//Current auto
 		if (autoTimer.get() == 0){
 			autoTimer.start();
 		}
@@ -115,13 +116,13 @@ public class Drive implements Component{
        rightMotorPower = limitMotor(rightMotorPower, highInput);
        
        //set the motors to power variables
-       if(!isInUse && !Recorder.isRecordingPlaying && !reverseDrive && !isInUse){
+       if(!Recorder.isRecordingPlaying && !reverseDrive && !isInUse){
     	   left.set(leftMotorPower);
     	   right.set(rightMotorPower);
        }
        
        //if reverse drive is enabled, set the motors to the negative value of the opposite side
-       if(!isInUse && !Recorder.isRecordingPlaying && reverseDrive && !isInUse){
+       if(!Recorder.isRecordingPlaying && reverseDrive && !isInUse){
     	   left.set(-rightMotorPower);
     	   right.set(-leftMotorPower);
        }

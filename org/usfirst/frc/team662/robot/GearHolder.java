@@ -50,7 +50,9 @@ public class GearHolder implements Component {
 		
 		boolean middleLimit = !limitSwitchMiddle.get();
 		
-		
+		SmartDashboard.putBoolean("Top", topLimit);
+		SmartDashboard.putBoolean("Middle", middleLimit);
+		SmartDashboard.putBoolean("Bottom", bottomLimit);
 		
 		if(!Recorder.isRecordingPlaying){		
 			

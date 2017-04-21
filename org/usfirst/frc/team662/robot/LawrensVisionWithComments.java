@@ -248,6 +248,8 @@ public class LawrensVisionWithComments implements Component{
 	}
 	public void update(){
 		VisionCamera();
+		Drive.isInUse = false;
+		state = State.DO_NOTHING;
 		if (!prevButton && Robot.stick.getRawButton(XboxMap.START)){
 			if (state == State.DO_NOTHING){
 				state = State.CENTER;
